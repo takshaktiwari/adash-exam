@@ -1,0 +1,30 @@
+{
+    "name": "takshak/adash-exam",
+    "keywords": ["laravel", "adash", "admin", "exam"],
+    "description": "exam extension for adash admin panel",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "authors": [
+        {
+            "name": "Takshak Tiwari",
+            "email": "takshaktiwari@gmail.com"
+        }
+    ],
+    "require": {
+        "takshak/adash": "*",
+        "maatwebsite/excel": "^3.1"
+    },
+    "autoload": {
+        "psr-4" : {
+            "Takshak\\Exam\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Takshak\\Exam\\ExamServiceProvider"
+            ]
+        }
+    }
+}
