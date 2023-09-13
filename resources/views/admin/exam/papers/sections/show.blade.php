@@ -58,10 +58,10 @@
         <div class="card-body" hx-get="{{ route('admin.exam.htmx.questions.list', ['section_id' => $section->id]) }}"
             hx-trigger="load" id="questions">
         </div>
-        <div class="card-footer">
+        {{-- <div class="card-footer">
             <button type="submit" class="btn btn-dark px-3">
                 <i class="fas fa-save"></i> Submit
             </button>
-        </div>
+        </div> --}}
     </form>
 </x-admin.layout>

@@ -37,6 +37,7 @@ Route::middleware('web')->group(function () {
 
             Route::prefix('htmx')->name('htmx.')->group(function () {
                 Route::get('questions/list', [QuestionController::class, 'htmxList'])->name('questions.list');
+                Route::get('questions/attach/toggle', [QuestionController::class, 'htmxAttachToggle'])->name('questions.attach.toggle');
             });
         });
 

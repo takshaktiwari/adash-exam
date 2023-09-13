@@ -173,6 +173,9 @@ class QuestionController extends Controller
     {
         $section = null;
         $questionIds = null;
+        $url_param_name = $request->get('section_id') ? 'section_id' : 'paper_id';
+        $url_param_value = $request->get('section_id') ? $request->get('section_id') : $request->get('paper_id');
+
         if ($request->get('section_id')) {
             $section = PaperSection::query()
                 ->with('questions:id')
@@ -213,6 +216,39 @@ class QuestionController extends Controller
         return View::first(['admin.exam.htmx.questions-list', 'exam::admin.exam.htmx.questions-list'])->with([
             'questions' =>  $questions,
             'model'   =>  $section ? $section : $paper,
+            'url_param_name' => $url_param_name,
+            'url_param_value' => $url_param_value,
         ]);
+    }
+
+    public function htmxAttachToggle(Request $request)
+    {
+        $request->validate([
+            'question_id' => 'required|numeric',
+            'section_id' => 'nullable|numeric',
+            'paper_id' => 'nullable|numeric'
+        ]);
+
+        if ($request->get('section_id')) {
+            $model = PaperSection::find($request->get('section_id'));
+            if ($model->questions->pluck('id')->contains($request->get('question_id'))) {
+                $model->questions()->detach($request->get('question_id'));
+            } else {
+                $model->questions()->attach([$request->get('question_id') => ['paper_id' => $model->paper_id]]);
+            }
+
+            return true;
+        }
+
+
+        $model = PaperSection::find($request->get('paper_id'));
+        if ($model->questions->pluck('id')->contains($request->get('question_id'))) {
+            $model->questions()->detach($request->get('question_id'));
+        } else {
+            $model->questions()->attach($request->get('question_id'));
+        }
+
+
+        return true;
     }
 }

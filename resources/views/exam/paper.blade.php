@@ -246,7 +246,7 @@
 
                 <!-- Modal footer -->
                 <div class="modal-footer justify-content-center">
-                    <a href="{{ route('exam.submit', [$paper]) }}" class="btn btn-info px-3"
+                    <a hx-boost="false" href="{{ route('exam.submit', [$paper]) }}" class="btn btn-info px-3"
                         onclick="closeFullscreen()">
                         <i class="fas fa-save"></i> Submit Exam
                     </a>

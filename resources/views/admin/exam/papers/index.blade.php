@@ -28,7 +28,14 @@
                     @foreach ($papers as $paper)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td class="small">{{ $paper->title }}</td>
+                            <td class="small">
+                                <span class="d-block">
+                                    {{ $paper->title }}
+                                </span>
+                                <span class="badge bg-{{ $paper->status ? 'success' : 'danger' }} fs-12">
+                                    {{ $paper->status() }}
+                                </span>
+                            </td>
                             <td>{{ $paper?->sections_count }}</td>
                             <td>{{ $paper?->questions_count }}</td>
                             <td>{{ $paper->questions_sum_marks }}</td>
@@ -42,6 +49,10 @@
                                 </div>
                             </td>
                             <td class="text-nowrap">
+                                <a href="{{ route('exam.instructions', [$paper]) }}"
+                                    class="btn btn-sm btn-info load-circle" title="Start Paper" target="_blank">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
                                 <a href="{{ route('admin.exam.papers.show', [$paper]) }}"
                                     class="btn btn-sm btn-primary load-circle" title="Paper Questions">
                                     <i class="fas fa-info-circle"></i>

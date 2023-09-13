@@ -59,12 +59,19 @@
                     </table>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
-                    @if (!$paper->sections->count())
-                        <a href="{{ route('admin.exam.papers.questions.edit', [$paper]) }}" class="btn btn-info px-3"
-                            title="Questions">
-                            <i class="fas fa-question-circle"></i> Questions
+                    <div>
+                        <a href="{{ route('exam.instructions', [$paper]) }}" class="btn btn-info load-circle"
+                            title="Start Paper" target="_blank">
+                            <i class="fas fa-external-link-alt"></i> Start Exam
                         </a>
-                    @endif
+                        @if (!$paper->sections->count())
+                            <a href="{{ route('admin.exam.papers.questions.edit', [$paper]) }}"
+                                class="btn btn-info px-3" title="Questions">
+                                <i class="fas fa-question-circle"></i> Questions
+                            </a>
+                        @endif
+                    </div>
+
 
                     <div>
                         <a href="{{ route('admin.exam.papers.edit', [$paper]) }}" class="btn btn-success px-3"
