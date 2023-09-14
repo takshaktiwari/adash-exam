@@ -24,6 +24,7 @@ class ExamController extends Controller
             ->withSum('questions', 'marks')
             ->active()
             ->get();
+
         return View::first(['exam.papers', 'exam::exam.papers'])->with([
             'papers' =>  $papers,
         ]);
@@ -188,13 +189,13 @@ class ExamController extends Controller
             ->get();
 
         foreach ($userQuestions as $userQuestion) {
-            if($userQuestion->status == 'answered'){
+            if($userQuestion->status == 'answered') {
                 if ($userQuestion->user_option_id != $userQuestion->correct_option_id && $paper->minus_mark_percent) {
                     $userQuestion->marks = ($userQuestion->marks * ($paper->minus_mark_percent / 100)) * (-1);
                 } elseif ($userQuestion->user_option_id != $userQuestion->correct_option_id) {
                     $userQuestion->marks = 0;
                 }
-            }else{
+            } else {
                 $userQuestion->marks = 0;
             }
 
