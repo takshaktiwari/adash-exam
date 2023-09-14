@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Takshak\Exam\Models\Question;
+use Takshak\Exam\Models\QuestionGroup;
 use Takshak\Exam\Models\QuestionOption;
 
 class QuestionsImport implements ToModel, WithBatchInserts, WithHeadingRow, WithChunkReading, ShouldQueue
@@ -21,43 +22,52 @@ class QuestionsImport implements ToModel, WithBatchInserts, WithHeadingRow, With
 
     public function model(array $row)
     {
-        if($this->rowsCount > 200) {
-            die();
-        }
+        $this->row = $row;
         $this->rowsCount++;
-
-        $this->row = array_filter($row, fn ($i) => $i);
-
+        if ($this->rowsCount > 250) {
+            abort(403, 'Cannot upload more than 250 questions at a time');
+        }
         if (
             empty($this->row['question']) ||
             empty($this->row['option_1']) ||
             empty($this->row['option_2']) ||
-            empty($this->row['option_3']) ||
-            empty($this->row['option_4']) ||
             empty($this->row['correct_ans']) ||
             !in_array($this->row['correct_ans'], [1, 2, 3, 4])
         ) {
-            return false;
+            return null;
+        }
+
+        $question = Question::where('question', $this->row['question'])->first();
+
+        $object = [
+            'question'    =>    $this->row['question'],
+            'answer'    =>    $this->row['answer'],
+            'marks'     =>  $this->row['marks'],
+        ];
+
+        if ($question) {
+            $question->update($object);
         } else {
-            $question = Question::where('question', $this->row['question'])->first();
+            $question = Question::create($object);
+        }
 
-            $object = [
-                'question'    =>    $this->row['question'],
-                'answer'    =>    $this->row['answer'],
-                'marks'     =>  $this->row['marks'],
-            ];
+        $groups = explode('|', $this->row['groups']);
+        $groups = array_map(function ($item) {
+            return trim($item);
+        }, $groups);
 
-            if ($question) {
-                $question->update($object);
-            } else {
-                $question = Question::create($object);
-            }
+        $question->questionGroups()->sync(
+            QuestionGroup::whereIn('name', $groups)->pluck('id')
+        );
 
-            QuestionOption::where('question_id', $question->id)->delete();
+        QuestionOption::where('question_id', $question->id)->delete();
 
-            $this->update_option($question, 'option_1', $this->row['option_1']);
-            $this->update_option($question, 'option_2', $this->row['option_2']);
+        $this->update_option($question, 'option_1', $this->row['option_1']);
+        $this->update_option($question, 'option_2', $this->row['option_2']);
+        if ($this->row['option_3']) {
             $this->update_option($question, 'option_3', $this->row['option_3']);
+        }
+        if ($this->row['option_4']) {
             $this->update_option($question, 'option_4', $this->row['option_4']);
         }
 

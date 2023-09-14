@@ -19,31 +19,63 @@
     ]" />
 
     <div class="row">
-        <div class="col-md-7">
-            <div class="card shadow-sm">
+        <div class="col-md-6">
+            <form method="POST" action="{{ route('admin.exam.questions.upload.do') }}" enctype="multipart/form-data"
+                class="card shadow-sm">
+                @csrf
                 <div class="card-body">
-                    <form method="POST" action="{{ route('admin.exam.questions.upload.do') }}" enctype="multipart/form-data"
-                        class="p-sm-4 p-1">
-                        @csrf
-                        <div class="form-group">
-                            <label for="">Select File <span class="text-danger">*</span></label>
-                            <input type="file" name="upload_file" class="form-control" required>
-                        </div>
-                        <div class="mb-4 text-danger">
-                            <li>File type should be .xlsx (Office 2007 - 365)</li>
-                            <li>Max file size should be less than 2MB (2048 KB)</li>
-                            <li>Excelsheet should be contain 200 products at a time</li>
-                            <li>Columns headings should be same as given in example file</li>
-                            <li>
-                                <a href="{{ route('admin.exam.questions.sample-download') }}"
-                                    class="text-primary font-weight-bold font-size-16">
-                                    <i class="fas fa-download"></i>
-                                    Download Sample File
-                                </a>
-                            </li>
-                        </div>
-                        <input type="submit" class="btn btn-dark px-4">
-                    </form>
+                    <div class="form-group">
+                        <label for="">Select File <span class="text-danger">*</span></label>
+                        <input type="file" name="upload_file" class="form-control" required>
+                    </div>
+                    <div class="text-danger">
+                        <li>File type should be .xlsx (Office 2007 - 365)</li>
+                        <li>Max file size should be less than 2MB (2048 KB)</li>
+                        <li>Do not upload more than 250 questions at on time.</li>
+                        <li>Excelsheet should be contain 200 products at a time</li>
+                        <li>Columns headings should be same as given in example file</li>
+                        <li>
+                            <a href="{{ route('admin.exam.questions.sample-download') }}"
+                                class="text-primary font-weight-bold font-size-16">
+                                <i class="fas fa-download"></i>
+                                Download Sample File
+                            </a>
+                        </li>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <input type="submit" class="btn btn-dark px-4">
+
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="my-auto">Instructions</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>
+                            <b>Question: </b> Write your full question here.
+                        </li>
+                        <li>
+                            <b>Answer: </b> Write you correct full descriptive answer.
+                        </li>
+                        <li>
+                            <b>Groups: </b> Write name of groups saperated by pipe sign ('|'). Only enter the valid group name given below: <br />
+                            <em>{{ $questionGroups->implode(' | ') }}</em>
+                        </li>
+                        <li>
+                            <b>Option (1 - 5): </b> Enter the option text, remove to column blank if question has not all 5 options.
+                        </li>
+                        <li>
+                            <b>Correct Ans: </b> Enter the correct option number. eg: <em>1</em> , <em>2</em> or <em>3</em>
+                        </li>
+                        <li>
+                            <b>Marks: </b> Enter the marks which this question will carry.
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

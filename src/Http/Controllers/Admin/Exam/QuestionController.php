@@ -139,7 +139,10 @@ class QuestionController extends Controller
 
     public function upload()
     {
-        return View::first(['admin.exam.questions.upload', 'exam::admin.exam.questions.upload']);
+        $questionGroups = QuestionGroup::pluck('name');
+        return View::first(['admin.exam.questions.upload', 'exam::admin.exam.questions.upload'])->with([
+            'questionGroups'    =>  $questionGroups
+        ]);
     }
 
     public function sampleDownload()
@@ -159,11 +162,10 @@ class QuestionController extends Controller
                 'import-question-' . time() . '.' . $request->file('upload_file')->extension()
             );
 
-
         //set_time_limit(0);
-        Excel::import(new QuestionsImport(), Storage::path($imported_file));
-        return redirect('admin/questions')->withErrors('SUCCESS !! Question List is successfully updated');
         try {
+            Excel::import(new QuestionsImport(), Storage::path($imported_file));
+            return redirect()->route('admin.exam.questions.index')->withErrors('SUCCESS !! Question List is successfully updated');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());
         }
