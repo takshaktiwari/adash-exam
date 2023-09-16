@@ -197,6 +197,8 @@ class QuestionController extends Controller
 
         if ($questionIds && $questionIds->count()) {
             $questionIds = $questionIds->map(fn ($item) => "'" . $item . "'")->implode(',');
+        } else {
+            $questionIds = null;
         }
 
         $questions = Question::query()
@@ -243,11 +245,11 @@ class QuestionController extends Controller
         }
 
 
-        $model = PaperSection::find($request->get('paper_id'));
-        if ($model->questions->pluck('id')->contains($request->get('question_id'))) {
-            $model->questions()->detach($request->get('question_id'));
+        $paper = Paper::find($request->get('paper_id'));
+        if ($paper->questions->pluck('id')->contains($request->get('question_id'))) {
+            $paper->questions()->detach($request->get('question_id'));
         } else {
-            $model->questions()->attach($request->get('question_id'));
+            $paper->questions()->attach($request->get('question_id'));
         }
 
 

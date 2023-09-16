@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Takshak\Exam\Models\Paper;
 use Illuminate\Support\Facades\View;
+use Takshak\Exam\Models\QuestionGroup;
 
 class PaperController extends Controller
 {
@@ -109,8 +110,10 @@ class PaperController extends Controller
 
     public function questionsEdit(Paper $paper)
     {
+        $questionGroups = QuestionGroup::get();
         return View::first(['admin.exam.papers.questions_edit', 'exam::admin.exam.papers.questions_edit'])->with([
-            'paper' =>  $paper
+            'paper' =>  $paper,
+            'questionGroups' => $questionGroups
         ]);
     }
 

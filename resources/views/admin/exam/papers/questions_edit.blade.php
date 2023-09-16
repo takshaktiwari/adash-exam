@@ -16,20 +16,37 @@
     @endpush
 
 
-    <form method="POST" action="{{ route('admin.exam.papers.questions.update', [$paper]) }}" class="card shadow-sm">
-        @csrf
+    <div class="card shadow-sm">
         <div class="card-header">
             <h5 class="my-auto">{{ $paper->title }}</h5>
         </div>
-        <div class="card-header">
-            <input type="text" name="search" class="form-control" placeholder="Search question" hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}" hx-trigger="change" hx-target="#questions">
+        <div class="card-header d-flex">
+            <div style="width: 350px">
+                <label for="">Question Group</label>
+                <select name="question_group_id" id="question_group_id" class="form-control"
+                    hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
+                    hx-include="#question_search" hx-trigger="change" hx-target="#questions">
+                    <option value="">-- Question group --</option>
+                    @foreach ($questionGroups as $group)
+                        <option value="{{ $group->id }}">
+                            {{ $group->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex-fill">
+                <label for="">Search</label>
+                <input type="text" name="search" id="question_search" class="form-control"
+                    placeholder="Search question"
+                    hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
+                    hx-include="#question_group_id" hx-trigger="change" hx-target="#questions">
+            </div>
         </div>
+    </div>
+
+    <form method="POST" action="{{ route('admin.exam.papers.questions.update', [$paper]) }}" class="card shadow-sm">
+        @csrf
         <div class="card-body" hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}" hx-trigger="load" id="questions">
-        </div>
-        <div class="card-footer">
-            <button type="submit" class="btn btn-dark px-3">
-                <i class="fas fa-save"></i> Submit
-            </button>
         </div>
     </form>
 </x-admin.layout>
