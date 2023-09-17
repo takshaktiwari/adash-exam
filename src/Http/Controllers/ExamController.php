@@ -43,6 +43,7 @@ class ExamController extends Controller
 
     public function start(Paper $paper)
     {
+        $paper->load('sections.questions:id')->load('questions:id');
         $userPaper = UserPaper::create([
             'user_id' => auth()->id(),
             'paper_id' => $paper->id,
@@ -50,11 +51,20 @@ class ExamController extends Controller
             'end_at' => now()->addMinutes($paper->total_time)
         ]);
 
+        $questionIds = collect([]);
+        if ($paper->sections->count()) {
+            foreach ($paper->sections as $section) {
+                $questionIds = $questionIds->merge($section->questions->pluck('id'));
+            }
+        } else {
+            $questionIds = $paper->questions->pluck('id');
+        }
+
         session([
             'exam' => [
                 'paper' => $paper,
                 'user_paper' => $userPaper,
-                'questions' => $paper->questions->pluck('id')
+                'questions' => $questionIds
             ]
         ]);
 
@@ -189,7 +199,7 @@ class ExamController extends Controller
             ->get();
 
         foreach ($userQuestions as $userQuestion) {
-            if($userQuestion->status == 'answered') {
+            if ($userQuestion->status == 'answered') {
                 if ($userQuestion->user_option_id != $userQuestion->correct_option_id && $paper->minus_mark_percent) {
                     $userQuestion->marks = ($userQuestion->marks * ($paper->minus_mark_percent / 100)) * (-1);
                 } elseif ($userQuestion->user_option_id != $userQuestion->correct_option_id) {

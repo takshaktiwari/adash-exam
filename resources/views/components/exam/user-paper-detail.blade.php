@@ -99,7 +99,7 @@
                 @endif
                 <div>
                     <b>Correct Answer: </b>
-                    {{ $question->userQuestion?->user_answer_text ? $question->userQuestion->user_answer_text : $question->correctOption->option_text }}
+                    {{ $question->correctOption->option_text }}
                 </div>
             </div>
         </div>

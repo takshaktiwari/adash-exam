@@ -32,7 +32,7 @@ class QuestionsImport implements ToModel, WithBatchInserts, WithHeadingRow, With
             empty($this->row['option_1']) ||
             empty($this->row['option_2']) ||
             empty($this->row['correct_ans']) ||
-            !in_array($this->row['correct_ans'], [1, 2, 3, 4])
+            !in_array($this->row['correct_ans'], [1, 2, 3, 4, 5])
         ) {
             return null;
         }
