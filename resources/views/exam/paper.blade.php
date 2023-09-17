@@ -66,7 +66,8 @@
             border-color: #f3ff43 !important;
             color: black !important;
         }
-        .bg-mark_review{
+
+        .bg-mark_review {
             background-color: #b3bf00 !important;
             border-color: #b3bf00 !important;
             color: black !important;
@@ -83,10 +84,31 @@
             border-color: #ffffff !important;
             color: black !important;
         }
+
+        @media only screen and (max-width: 767px) {
+            #question_action {
+                width: 100%;
+                left: 0px;
+            }
+            #question_action .btn{
+                font-size: 0.8rem
+            }
+            #sidebar {
+                display: none;
+            }
+            #sidebar.show {
+                display: block;
+            }
+        }
     </style>
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark py-1 border-bottom">
         <div class="container-fluid">
-            <a class="navbar-brand" href="javascript:void(0)">Logo</a>
+            <div class="d-flex">
+                <a class="navbar-brand" href="javascript:void(0)">Logo</a>
+                <button class="btn btn-sm d-md-none d-block" data-bs-toggle="collapse" data-bs-target="#sidebar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -107,68 +129,73 @@
             </div>
         </div>
     </nav>
-    <form action="{{ route('exam.question-save', [$paper, $question]) }}" method="POST" id="wrapper" class="d-flex">
+    <div id="wrapper" class="d-flex">
         @csrf
         <x-exam-exam:exam-sidebar :paper="$paper" :userQuestions="$userQuestions" :question="$question" />
 
-        <div id="question_area" class="flex-fill px-4 pt-4">
-            <div class="question">
-                <b>{{ $questionKey + 1 }}.</b>
-                {{ $question->question }}
+        <form action="{{ route('exam.question-save', [$paper, $question]) }}" method="POST" class="flex-fill">
+            @csrf
+            <div id="question_area" class="flex-fill px-4 pt-4">
+                <div class="question">
+                    <b>{{ $questionKey + 1 }}.</b>
+                    {{ $question->question }}
+                </div>
+                <div class="options mt-4">
+                    <ul class="list-group">
+                        @foreach ($question->options as $option)
+                            <div class="form-check list-group-item ps-4">
+                                <label class="form-check-label ps-3" for="option_{{ $option->id }}">
+                                    <input type="radio" class="form-check-input" id="option_{{ $option->id }}"
+                                        name="user_option" value="{{ $option->id }}" required
+                                        {{ $userQuestion?->user_option_id == $option->id ? 'checked' : '' }}>
+                                    <span>{{ $option->option_text }}</span>
+                                </label>
+                            </div>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
-            <div class="options mt-4">
-                <ul class="list-group">
-                    @foreach ($question->options as $option)
-                        <div class="form-check list-group-item ps-4">
-                            <label class="form-check-label ps-3" for="option_{{ $option->id }}">
-                                <input type="radio" class="form-check-input" id="option_{{ $option->id }}"
-                                    name="user_option" value="{{ $option->id }}" required
-                                    {{ $userQuestion?->user_option_id == $option->id ? 'checked' : '' }}>
-                                <span>{{ $option->option_text }}</span>
-                            </label>
-                        </div>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
-        <div id="question_action" class="d-flex justify-content-between bg-light border-top border-dark py-2 px-4">
-            <div>
-                @if ($questions->get($questionKey - 1))
-                    <a href="{{ route('exam.paper', [$paper, 'question_id' => $questions->get($questionKey - 1)]) }}"
-                        class="btn btn-info px-3">
-                        <i class="fa-solid fa-backward"></i> Prev
+            <div id="question_action" class="d-flex justify-content-between bg-light border-top border-dark py-2 px-4">
+                <div class="d-flex flex-wrap gap-2">
+                    @if ($questions->get($questionKey - 1))
+                        <a href="{{ route('exam.paper', [$paper, 'question_id' => $questions->get($questionKey - 1)]) }}"
+                            class="btn btn-info px-md-3 px-2">
+                            <i class="fa-solid fa-backward"></i> Prev
+                        </a>
+                    @endif
+                    @if ($questions->get($questionKey + 1))
+                        <a href="{{ route('exam.paper', [$paper, 'question_id' => $questions->get($questionKey + 1)]) }}"
+                            class="btn btn-info px-md-3 px-2">
+                            Next <i class="fa-solid fa-forward"></i>
+                        </a>
+                    @endif
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ route('exam.question-mark', [$paper, $question, 'next_question_id' => $questions->get($questionKey + 1)]) }}"
+                        class="btn bg-marked px-md-3 px-2">
+                        <i class="fa-solid fa-marker"></i> Mark For Later
                     </a>
-                @endif
-                @if ($questions->get($questionKey + 1))
-                    <a href="{{ route('exam.paper', [$paper, 'question_id' => $questions->get($questionKey + 1)]) }}"
-                        class="btn btn-info px-3">
-                        Next <i class="fa-solid fa-forward"></i>
-                    </a>
-                @endif
+                    <button type="submit" class="btn bg-mark_review px-md-3 px-2"
+                        onclick="document.getElementById('input_mark_review').value = 1">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Save for review
+                    </button>
+                </div>
+                <div class="my-auto">
+                    <input type="hidden" name="mark_review" id="input_mark_review" value="">
+                    <input type="hidden" name="next_question_id" value="{{ $questions->get($questionKey + 1) }}">
+                    <button type="submit" class="btn btn-success px-md-3 px-2"
+                        onclick="document.getElementById('input_mark_review').value = ''">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        {{ $questions->get($questionKey + 1) ? 'Save & Next' : 'Save Question' }}
+                    </button>
+                </div>
             </div>
-            <div>
-                <a href="{{ route('exam.question-mark', [$paper, $question, 'next_question_id' => $questions->get($questionKey + 1)]) }}"
-                    class="btn bg-marked px-3">
-                    <i class="fa-solid fa-marker"></i> Mark For Later
-                </a>
-                <button type="submit" class="btn bg-mark_review px-3" onclick="document.getElementById('input_mark_review').value = 1">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    Save for review
-                </button>
-            </div>
-            <div>
-                <input type="hidden" name="mark_review" id="input_mark_review" value="">
-                <input type="hidden" name="next_question_id" value="{{ $questions->get($questionKey + 1) }}">
-                <button type="submit" class="btn btn-success px-3" onclick="document.getElementById('input_mark_review').value = ''">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    {{ $questions->get($questionKey + 1) ? 'Save & Next' : 'Save Question' }}
-                </button>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 
     <div class="modal" id="instructions_modal">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
 
                 <!-- Modal Header -->
@@ -217,7 +244,8 @@
                             @endif
                             <tr>
                                 <th>Answered:</th>
-                                <td>{{ $userQuestions->where('status', 'answered')->count() + $userQuestions->where('status', 'mark_review')->count() }}</td>
+                                <td>{{ $userQuestions->where('status', 'answered')->count() + $userQuestions->where('status', 'mark_review')->count() }}
+                                </td>
                             </tr>
                             <tr>
                                 <th>For Review:</th>
@@ -258,6 +286,5 @@
             </div>
         </div>
     </div>
-
 
 </x-exam-exam:exam-layout>

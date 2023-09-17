@@ -23,6 +23,8 @@
 </head>
 
 <body hx-boost="true">
+    <x-alertt-alert />
+
     {{ $slot }}
 
 

@@ -28,6 +28,7 @@ class QuestionController extends Controller
                     $query->where('question_groups.id', request('question_group_id'));
                 });
             })
+            ->latest()
             ->paginate(100);
 
         return View::first(['admin.exam.questions.index', 'exam::admin.exam.questions.index'])

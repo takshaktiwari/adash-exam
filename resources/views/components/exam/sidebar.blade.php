@@ -1,5 +1,5 @@
 
-<div id="sidebar" class="bg-dark">
+<div id="sidebar" class="bg-dark ">
     <div class="user pt-4 pb-2">
         <div class="text-center">
             <img src="{{ auth()->user()->profileImg() }}" alt="user" class="rounded-circle img-thumbnail mb-3">

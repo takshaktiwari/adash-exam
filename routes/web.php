@@ -43,6 +43,7 @@ Route::middleware('web')->group(function () {
 
     Route::middleware(['auth', GatesMiddleware::class])->prefix('exam')->name('exam.')->group(function () {
         Route::get('papers', [ExamController::class, 'papers'])->name('papers');
+        Route::get('{paper}/authenticate', [ExamController::class, 'authenticate'])->name('authenticate');
         Route::get('{paper}/instructions', [ExamController::class, 'instructions'])->name('instructions');
         Route::get('{paper}/start', [ExamController::class, 'start'])->name('start');
         Route::get('{paper}/paper', [ExamController::class, 'paper'])->name('paper');

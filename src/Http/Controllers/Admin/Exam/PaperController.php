@@ -39,6 +39,8 @@ class PaperController extends Controller
             'expire_at'     =>  'required|date',
             'minus_mark_percent' =>  'nullable|numeric',
             'instruction' =>  'required|string',
+            'security_code' => 'nullable',
+            'attempts_limit' => 'nullable|numeric',
         ]);
 
         $paper = Paper::create([
@@ -49,6 +51,8 @@ class PaperController extends Controller
             'minus_mark_percent'     =>  $request->post('minus_mark_percent'),
             'instruction'     =>  $request->post('instruction'),
             'status'     =>  $request->boolean('status'),
+            'security_code'     =>  $request->post('security_code'),
+            'attempts_limit'     =>  $request->post('attempts_limit'),
         ]);
 
         if ($request->post('has_sections')) {
@@ -87,6 +91,8 @@ class PaperController extends Controller
             'expire_at'     =>  'required|date',
             'minus_mark_percent' =>  'nullable|numeric',
             'instruction' =>  'required|string',
+            'security_code' => 'nullable',
+            'attempts_limit' => 'nullable|numeric',
         ]);
 
         $paper->update([
@@ -97,6 +103,8 @@ class PaperController extends Controller
             'minus_mark_percent'     =>  $request->post('minus_mark_percent'),
             'instruction'     =>  $request->post('instruction'),
             'status'     =>  $request->boolean('status'),
+            'security_code'     =>  $request->post('security_code'),
+            'attempts_limit'     =>  $request->post('attempts_limit'),
         ]);
 
         return redirect()->route('admin.exam.papers.show', [$paper])->withErrors('Updated !! Paper has been successfully created. ');

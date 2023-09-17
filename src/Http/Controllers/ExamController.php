@@ -30,10 +30,25 @@ class ExamController extends Controller
         ]);
     }
 
+    public function authenticate(Request $request, Paper $paper)
+    {
+        if($paper->security_code != $request->input('security_code')){
+            return redirect()->route('exam.papers')->withErrors('SORRY !! Security code is not correct. Please try again.');
+        }
+
+        $arr = session('exam', []);
+        $arr['authenticated'] = true;
+        session(['exam' => $arr]);
+        return redirect()->route('exam.instructions', [$paper]);
+    }
+
     public function instructions(Paper $paper)
     {
         if (!$paper->isActive()) {
-            return redirect('/')->withErrors('SORRY !! Exam is not activated yet.');
+            return redirect()->route('exam.papers')->withErrors('SORRY !! Exam is not activated yet.');
+        }
+        if ($paper->security_code && !session('exam.authenticated')) {
+            return redirect()->route('exam.papers')->withErrors('SORRY !! Please enter exam security key / code.');
         }
         $paper->loadCount('sections')->loadCount('questions')->loadSum('questions', 'marks');
         return View::first(['exam.instructions', 'exam::exam.instructions'])->with([
@@ -43,6 +58,10 @@ class ExamController extends Controller
 
     public function start(Paper $paper)
     {
+        if ($paper->security_code && !session('exam.authenticated')) {
+            return redirect()->route('exam.papers')->withErrors('SORRY !! Please enter exam security key / code.');
+        }
+
         $paper->load('sections.questions:id')->load('questions:id');
         $userPaper = UserPaper::create([
             'user_id' => auth()->id(),
@@ -60,13 +79,12 @@ class ExamController extends Controller
             $questionIds = $paper->questions->pluck('id');
         }
 
-        session([
-            'exam' => [
-                'paper' => $paper,
-                'user_paper' => $userPaper,
-                'questions' => $questionIds
-            ]
-        ]);
+        $arr = session('exam', []);
+        $arr['paper'] = $paper;
+        $arr['user_paper'] = $userPaper;
+        $arr['questions'] = $questionIds;
+
+        session(['exam' => $arr]);
 
         return redirect()->route('exam.paper', [$paper]);
     }
@@ -76,6 +94,10 @@ class ExamController extends Controller
         if (!session('exam.paper.id') || !session('exam.user_paper.id')) {
             return redirect('/')->withErrors('SORRY !! You need to start the exam again');
         }
+        if ($paper->security_code && !session('exam.authenticated')) {
+            return redirect()->route('exam.papers')->withErrors('SORRY !! Please enter exam security key / code.');
+        }
+
         $questions = collect(session('exam.questions'));
         $question_id = $request->get('question_id');
 
@@ -217,4 +239,6 @@ class ExamController extends Controller
 
         return redirect()->route('exam.papers')->withSuccess('SUCCESS !! Exam has been submitted successfully.');
     }
+
+
 }

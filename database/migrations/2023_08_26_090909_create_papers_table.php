@@ -21,6 +21,8 @@ return new class () extends Migration {
             $table->dateTime('expire_at')->comment('date time');
             $table->text('instruction')->nullable();
             $table->boolean('status')->nullable()->default(false);
+            $table->string('security_code')->nullable()->default(null);
+            $table->integer('attempts_limit')->nullable()->default(null);
             $table->timestamps();
         });
     }

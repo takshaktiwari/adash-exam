@@ -32,18 +32,56 @@
                         </div>
                     </div>
                     <div class="col-md-3 my-auto">
-                        <a href="{{ route('exam.instructions', [$paper]) }}" class="btn btn-sm btn-info px-3">
-                            Start Exam <i class="fas fa-arrow-right"></i>
-                        </a>
+                        @if ($paper->security_code)
+                            <a href="javascript:void(0)"
+                                class="btn btn-sm btn-info px-3 {{ !$paper->hasAttempts() ? 'disabled' : '' }}"
+                                data-bs-toggle="modal" data-toggle="modal"
+                                data-bs-target="#security_modal_{{ $paper->id }}"
+                                data-target="#security_modal_{{ $paper->id }}">
+                                Start Exam <i class="fas fa-arrow-right"></i>
+                            </a>
+                        @else
+                            <a href="{{ route('exam.instructions', [$paper]) }}"
+                                class="btn btn-sm btn-info px-3 {{ !$paper->hasAttempts() ? 'disabled' : '' }}">
+                                Start Exam <i class="fas fa-arrow-right"></i>
+                            </a>
+                        @endif
                         <a href="{{ route('exam.user-papers.index', [$paper]) }}" class=" small">
                             <b>Attempts:</b>
                             <span>{{ $paper->user_papers_count }}</span>
                         </a>
                     </div>
                 </div>
-
-
             </div>
         </div>
+
+        @if ($paper->security_code)
+            <div class="modal" id="security_modal_{{ $paper->id }}">
+                <div class="modal-dialog">
+                    <form hx-boost="false" action="{{ route('exam.authenticate', [$paper]) }}" class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Enter Security Key</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <input type="text" class="form-control" name="security_code" required>
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-dark px-3">
+                                <i class="fas fa-save"></i> Submit
+                            </button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        @endif
     @endforeach
 </div>

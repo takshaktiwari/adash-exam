@@ -55,6 +55,14 @@
                                 <th>Status</th>
                                 <td>{{ $paper->status() }}</td>
                             </tr>
+                            <tr>
+                                <th>Security Code</th>
+                                <td>{{ $paper->security_code }}</td>
+                            </tr>
+                            <tr>
+                                <th>Attempts Limit</th>
+                                <td>{{ $paper->attempts_limit }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

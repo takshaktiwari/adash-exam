@@ -87,6 +87,20 @@
                           </div>
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="">Has Security Code (optional)</label>
+                        <input type="text" name="security_code" value="{{ old('security_code', $paper->security_code) }}" class="form-control">
+                        <span class="small">Security code need to be entered to start the exam if has code</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="">Attempts Limit (optional)</label>
+                        <input type="number" name="attempts_limit" value="{{ old('attempts_limit', $paper->attempts_limit) }}" class="form-control">
+                        <span class="small">Limit the attemts a user will get. Blank will be unlimited.</span>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <label for="">Question Paper Instruction <span class="text-danger">*</span></label>

@@ -65,4 +65,24 @@ class Paper extends Model
     {
         return $this->status ? 'Active' : 'Inactive';
     }
+
+    public function hasAttempts()
+    {
+        if(!$this->attempts_limit){
+            return true;
+        }
+
+        if(!$this->user_papers_count)
+        {
+            $this->loadCount(['userPapers' => function ($query) {
+                $query->where('user_id', auth()->id());
+            }]);
+        }
+
+        if($this->attempts_limit > $this->user_papers_count){
+            return true;
+        }
+
+        return false;
+    }
 }

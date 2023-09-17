@@ -63,21 +63,32 @@
                             value="{{ old('marks') }}">
                     </div>
                     <div class="form-group">
-                        <label for="">Question Choices <span class="text-danger">*</span></label>
-                        @for ($i = 1; $i <= 4; $i++)
-                            <div class="d-flex mb-2">
-                                <div class="flex-fill">
-                                    <input type="text" name="ques_option[{{ $i }}]"
-                                        class="form-control rounded-0" placeholder="Option Choice {{ $i }}"
-                                        value="{{ old('ques_option')[$i] ?? '' }}" maxlength="250" required="">
-                                </div>
+                        <label for="">
+                            Question Choices <span class="text-danger">*</span>
 
-                                <label class="mb-0">
-                                    <input type="radio" name="correct_ans" value="{{ $i }}" required="">
-                                    <div class="answercheck form-control rounded-0"></div>
-                                </label>
-                            </div>
-                        @endfor
+                            <a href="javascript:void(0)" id="add_option_btn" class="badge bg-primary">+ Add More</a>
+                        </label>
+                        <div id="question_options">
+                            @for ($i = 1; $i <= 4; $i++)
+                                <div class="d-flex mb-2 option">
+                                    <div class="flex-fill">
+                                        <input type="text" name="ques_option[{{ $i }}]"
+                                            class="form-control rounded-0"
+                                            placeholder="Option Choice {{ $i }}"
+                                            value="{{ old('ques_option')[$i] ?? '' }}" maxlength="250" required="">
+                                        <a href="javascript:void(0)" class="fw-bold text-danger small remove_option">
+                                            <i class="fas fa-times"></i> Remove
+                                        </a>
+                                    </div>
+
+                                    <label class="mb-0">
+                                        <input type="radio" name="correct_ans" value="{{ $i }}"
+                                            required="">
+                                        <div class="answercheck form-control rounded-0"></div>
+                                    </label>
+                                </div>
+                            @endfor
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="">Descriptive Answer </label>
@@ -85,7 +96,8 @@
                     </div>
                     <div class="form-group">
                         <label for="">Question Groups <span class="text-danger">*</span></label>
-                        <select name="question_group_id[]" id="question_group_id" class="form-control select2" multiple required>
+                        <select name="question_group_id[]" id="question_group_id" class="form-control select2" multiple
+                            required>
                             <option value="">-- Select --</option>
                             @foreach ($questionGroups as $group)
                                 <option value="{{ $group->id }}">
@@ -101,4 +113,39 @@
             </form>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                $("#add_option_btn").click(function() {
+                    var optionsCount = $("#question_options .option").length;
+                    var newOptionCount = ++optionsCount;
+                    console.log(newOptionCount);
+                    $("#question_options").append(`
+                        <div class="d-flex mb-2 option">
+                            <div class="flex-fill">
+                                <input type="text" name="ques_option[${newOptionCount}]"
+                                    class="form-control rounded-0"
+                                    placeholder="Option Choice ${newOptionCount}"
+                                    value="" maxlength="250" required="">
+                                <a href="javascript:void(0)" class="fw-bold text-danger small remove_option">
+                                    <i class="fas fa-times"></i> Remove
+                                </a>
+                            </div>
+
+                            <label class="mb-0">
+                                <input type="radio" name="correct_ans" value="${newOptionCount}"
+                                    required="">
+                                <div class="answercheck form-control rounded-0"></div>
+                            </label>
+                        </div>
+                    `);
+                });
+
+                $('#question_options').on('click', '.remove_option', function(){
+                    $(this).parent().parent().remove();
+                });
+            });
+        </script>
+    @endpush
 </x-admin.layout>
