@@ -32,7 +32,7 @@ class ExamController extends Controller
 
     public function authenticate(Request $request, Paper $paper)
     {
-        if($paper->security_code != $request->input('security_code')){
+        if($paper->security_code != $request->input('security_code')) {
             return redirect()->route('exam.papers')->withErrors('SORRY !! Security code is not correct. Please try again.');
         }
 
@@ -79,10 +79,14 @@ class ExamController extends Controller
             $questionIds = $paper->questions->pluck('id');
         }
 
+        $paper->unsetRelation('sections');
+        $paper->unsetRelation('questions');
         $arr = session('exam', []);
         $arr['paper'] = $paper;
         $arr['user_paper'] = $userPaper;
         $arr['questions'] = $questionIds;
+        $arr['start_at'] = now()->format('Y-m-d H:i:s');
+        $arr['end_at'] = now()->addMinutes($paper->total_time)->format('Y-m-d H:i:s');
 
         session(['exam' => $arr]);
 

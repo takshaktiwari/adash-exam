@@ -50,12 +50,16 @@
 
     <div class="row">
         <div class="col-md-7">
-            <form method="POST" action="{{ route('admin.exam.questions.store') }}" class="card shadow-sm">
+            <form method="POST" action="{{ route('admin.exam.questions.store') }}" class="card shadow-sm" enctype="multipart/form-data">
                 @csrf
                 <div class="card-body">
                     <div class="form-group">
                         <label for="">Question <span class="text-danger">*</span></label>
                         <textarea name="question" rows="2" class="form-control" placeholder="Write your question" required="">{{ old('question') }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Image </label>
+                        <input type="file" name="image" class="form-control" />
                     </div>
                     <div class="form-group">
                         <label for="">Marks <span class="text-danger">*</span></label>

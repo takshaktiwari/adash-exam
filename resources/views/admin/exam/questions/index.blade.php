@@ -54,6 +54,10 @@
                                 <span class="badge bg-dark fs-14">{{ $question->marks }}</span>
                             </td>
                             <td class="text-nowrap">
+                                <a href="{{ route('admin.exam.questions.show', [$question]) }}"
+                                    class="btn btn-sm btn-info" >
+                                    <i class="fas fa-info-circle"></i>
+                                </a>
                                 <a href="{{ route('admin.exam.questions.edit', [$question]) }}"
                                     class="btn btn-sm btn-success" title="Edit Date Slot">
                                     <i class="fas fa-edit"></i>

@@ -13,6 +13,7 @@ use Takshak\Exam\Imports\QuestionsImport;
 use Takshak\Exam\Models\Paper;
 use Takshak\Exam\Models\PaperSection;
 use Takshak\Exam\Models\QuestionGroup;
+use Takshak\Imager\Facades\Imager;
 
 class QuestionController extends Controller
 {
@@ -53,14 +54,25 @@ class QuestionController extends Controller
             'correct_ans'    =>    'required|numeric',
             'answer'        =>    'required|max:500',
             'marks'         =>  'required|numeric|min:1',
-            'question_group_id' => 'required|array|min:1'
+            'question_group_id' => 'required|array|min:1',
+            'image' => 'nullable|file'
         ]);
 
-        $ques = Question::create([
-            'question'        =>    $request->post('question'),
-            'answer'        =>    $request->post('answer'),
-            'marks'         =>  $request->post('marks'),
-        ]);
+        $ques = new Question();
+        $ques->question = $request->post('question');
+        $ques->answer   = $request->post('answer');
+        $ques->marks    = $request->post('marks');
+
+        if ($request->file('image')) {
+            $ques->image = str()->of(microtime())->slug('-')
+                ->prepend('questions/')
+                ->append('.' . $request->file('image')->extension());
+            Imager::init($request->file('image'))
+                ->resizeWidth(400)
+                ->save(Storage::disk('public')->path($ques->image));
+        }
+
+        $ques->save();
 
         foreach ($request->input('ques_option') as $key => $ques_option) {
             if (!empty($ques_option)) {
@@ -76,6 +88,14 @@ class QuestionController extends Controller
         $ques->questionGroups()->sync($request->question_group_id);
 
         return redirect()->back()->withErrors('CREATED !! New question is created');
+    }
+
+    public function show(Question $question)
+    {
+        return View::first(['admin.exam.questions.show', 'exam::admin.exam.questions.show'])
+            ->with([
+                'question'   =>  $question
+            ]);
     }
 
     public function edit($id)
@@ -100,11 +120,19 @@ class QuestionController extends Controller
         ]);
 
         try {
-            $question->update([
-                'question'        =>    $request->post('question'),
-                'answer'        =>    $request->post('answer'),
-                'marks'         =>  $request->post('marks'),
-            ]);
+            $question->question = $request->post('question');
+            $question->answer   = $request->post('answer');
+            $question->marks    = $request->post('marks');
+
+            if ($request->file('image')) {
+                $question->image = str()->of(microtime())->slug('-')
+                    ->prepend('questions/')
+                    ->append('.' . $request->file('image')->extension());
+                Imager::init($request->file('image'))
+                    ->resizeWidth(400)
+                    ->save(Storage::disk('public')->path($question->image));
+            }
+            $question->save();
 
             QuestionOption::where('question_id', $question->id)->delete();
 

@@ -56,13 +56,26 @@
 
     <div class="row">
         <div class="col-md-7">
-            <form method="POST" action="{{ route('admin.exam.questions.update', [$question]) }}" class="card shadow-sm">
+            <form method="POST" action="{{ route('admin.exam.questions.update', [$question]) }}" class="card shadow-sm"
+                enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="card-body">
                     <div class="form-group">
                         <label for="">Question <span class="text-danger">*</span></label>
                         <textarea name="question" rows="2" class="form-control" placeholder="Write your question" required="">{{ $question->question }}</textarea>
+                    </div>
+                    <div class="d-flex gap-3">
+                        @if ($question->image)
+                            <div class="">
+                                <img src="{{ storage($question->image) }}" alt="question img" class="rounded-2"
+                                    style="max-height: 65px">
+                            </div>
+                        @endif
+                        <div class="form-group flex-fill">
+                            <label for="">Image </label>
+                            <input type="file" name="image" class="form-control" />
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="">Marks <span class="text-danger">*</span></label>
@@ -82,9 +95,9 @@
                                             class="form-control rounded-0"
                                             placeholder="Option Choice {{ $key }}"
                                             value="{{ $ques_option->option_text }}" maxlength="250" required="">
-                                            <a href="javascript:void(0)" class="fw-bold text-danger small remove_option">
-                                                <i class="fas fa-times"></i> Remove
-                                            </a>
+                                        <a href="javascript:void(0)" class="fw-bold text-danger small remove_option">
+                                            <i class="fas fa-times"></i> Remove
+                                        </a>
                                     </div>
 
                                     <label class="mb-0">
@@ -148,7 +161,7 @@
                     `);
                 });
 
-                $('#question_options').on('click', '.remove_option', function(){
+                $('#question_options').on('click', '.remove_option', function() {
                     $(this).parent().parent().remove();
                 });
             });

@@ -85,20 +85,29 @@
             color: black !important;
         }
 
+        #question_area .form-check-input[type=radio]{
+            border-color: #8040f7;
+        }
+
         @media only screen and (max-width: 767px) {
             #question_action {
                 width: 100%;
                 left: 0px;
             }
-            #question_action .btn{
+
+            #question_action .btn {
                 font-size: 0.8rem
             }
+
             #sidebar {
                 display: none;
             }
+
             #sidebar.show {
                 display: block;
             }
+
+
         }
     </style>
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark py-1 border-bottom">
@@ -113,6 +122,13 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="mynavbar">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:void(0)">
+                            Time Left: <b id="time_left_timer"></b>
+                        </a>
+                    </li>
+                </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)" data-bs-toggle="modal"
@@ -137,8 +153,16 @@
             @csrf
             <div id="question_area" class="flex-fill px-4 pt-4">
                 <div class="question">
-                    <b>{{ $questionKey + 1 }}.</b>
-                    {{ $question->question }}
+                    <div class="d-flex gap-2 mb-4">
+                        <b>{{ $questionKey + 1 }}.</b>
+                        <div>
+                            {!! $question->question !!}
+                        </div>
+                    </div>
+                    <a hx-boost="false" href="{{ storage($question->image) }}" data-fancybox>
+                        <img src="{{ storage($question->image) }}" alt="question img" class="rounded-2"
+                            style="max-height: 200px">
+                    </a>
                 </div>
                 <div class="options mt-4">
                     <ul class="list-group">
@@ -287,4 +311,47 @@
         </div>
     </div>
 
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
+        <script>
+            Fancybox.bind("[data-fancybox]", {
+                // Your custom options
+            });
+
+            // Set the date we're counting down to
+            var countDownDate = new Date("{{ session('exam.end_at') }}").getTime();
+
+            // Update the count down every 1 second
+            var x = setInterval(function() {
+
+                // Get today's date and time
+                var now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Display the result in the element with id="demo"
+                var timerText = '';
+                if (days) {
+                    timerText = timerText + days + ":";
+                }
+                timerText = hours.toString().padStart(2, '0') + ":" + minutes + ":" + seconds;
+
+                document.getElementById("time_left_timer").innerHTML = timerText;
+
+                // If the count down is finished, write some text
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("time_left_timer").innerHTML = "EXPIRED";
+                }
+            }, 1000);
+        </script>
+    @endpush
 </x-exam-exam:exam-layout>
