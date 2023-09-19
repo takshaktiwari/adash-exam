@@ -210,11 +210,21 @@
                 <div class="my-auto">
                     <input type="hidden" name="mark_review" id="input_mark_review" value="">
                     <input type="hidden" name="next_question_id" value="{{ $questions->get($questionKey + 1) }}">
-                    <button type="submit" class="btn btn-success px-md-3 px-2"
-                        onclick="document.getElementById('input_mark_review').value = ''">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                        {{ $questions->get($questionKey + 1) ? 'Save & Next' : 'Save Question' }}
-                    </button>
+
+                    @if ($questions->get($questionKey + 1))
+                        <button type="submit" class="btn btn-success px-md-3 px-2"
+                            onclick="document.getElementById('input_mark_review').value = ''">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Save & Next
+                        </button>
+                    @else
+                        <button type="submit" class="btn btn-success px-md-3 px-2"
+                            onclick="document.getElementById('input_mark_review').value = ''">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Save & Submit
+                        </button>
+                    @endif
+
                 </div>
             </div>
         </form>
@@ -316,6 +326,13 @@
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
+        @if (request('is_end'))
+            <script>
+                $(document).ready(function() {
+                    $("#exam_statistics").modal('show');
+                });
+            </script>
+        @endif
         <script>
             Fancybox.bind("[data-fancybox]", {
                 // Your custom options
@@ -344,7 +361,8 @@
                 if (days) {
                     timerText = timerText + days + ":";
                 }
-                timerText = hours.toString().padStart(2, '0') + ":" + minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
+                timerText = hours.toString().padStart(2, '0') + ":" + minutes.toString().padStart(2, '0') + ":" +
+                    seconds.toString().padStart(2, '0');
 
                 document.getElementById("time_left_timer").innerHTML = timerText;
 

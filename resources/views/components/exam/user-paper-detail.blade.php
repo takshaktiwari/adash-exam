@@ -97,9 +97,13 @@
                         {{ $question->userQuestion->user_answer_text }}
                     </div>
                 @endif
-                <div>
+                <div class="mb-2">
                     <b>Correct Answer: </b>
                     {{ $question->correctOption->option_text }}
+                </div>
+                <div>
+                    <b>Explaination: </b>
+                    {{ $question->answer }}
                 </div>
             </div>
         </div>
