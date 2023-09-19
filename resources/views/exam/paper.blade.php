@@ -85,7 +85,7 @@
             color: black !important;
         }
 
-        #question_area .form-check-input[type=radio]{
+        #question_area .form-check-input[type=radio] {
             border-color: #8040f7;
         }
 
@@ -159,10 +159,12 @@
                             {!! $question->question !!}
                         </div>
                     </div>
-                    <a hx-boost="false" href="{{ storage($question->image) }}" data-fancybox>
-                        <img src="{{ storage($question->image) }}" alt="question img" class="rounded-2"
-                            style="max-height: 200px">
-                    </a>
+                    @if ($question->image)
+                        <a hx-boost="false" href="{{ storage($question->image) }}" data-fancybox>
+                            <img src="{{ storage($question->image) }}" alt="question img" class="rounded-2"
+                                style="max-height: 200px">
+                        </a>
+                    @endif
                 </div>
                 <div class="options mt-4">
                     <ul class="list-group">
@@ -342,7 +344,7 @@
                 if (days) {
                     timerText = timerText + days + ":";
                 }
-                timerText = hours.toString().padStart(2, '0') + ":" + minutes + ":" + seconds;
+                timerText = hours.toString().padStart(2, '0') + ":" + minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
 
                 document.getElementById("time_left_timer").innerHTML = timerText;
 
@@ -350,6 +352,7 @@
                 if (distance < 0) {
                     clearInterval(x);
                     document.getElementById("time_left_timer").innerHTML = "EXPIRED";
+                    window.location.href = "{{ route('exam.submit', [$paper]) }}";
                 }
             }, 1000);
         </script>
