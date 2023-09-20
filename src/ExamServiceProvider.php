@@ -15,6 +15,7 @@ class ExamServiceProvider extends ServiceProvider
             View\Components\Exam\AdminSidebarLinks::class,
             View\Components\Exam\ExamLayout::class,
             View\Components\Exam\ExamSidebar::class,
+            View\Components\Exam\ExamNavbar::class,
             View\Components\Exam\Papers::class,
             View\Components\Exam\UserPapers::class,
             View\Components\Exam\UserPaperDetail::class,
