@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark py-1 border-bottom">
     <div class="container-fluid">
         <div class="d-flex">
-            <a class="navbar-brand" href="javascript:void(0)">Logo</a>
+            <a class="navbar-brand" href="javascript:void(0)">Exam</a>
             <button class="btn btn-sm d-md-none d-block" data-bs-toggle="collapse" data-bs-target="#sidebar">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -10,7 +10,7 @@
         <ul class="navbar-nav ms-auto flex-fill d-flex me-3">
             <li class="nav-item ms-auto">
                 <a class="nav-link" href="javascript:void(0)">
-                    Time Left: <b id="time_left_timer"></b>
+                    Time: <b id="time_left_timer"></b>
                 </a>
             </li>
         </ul>

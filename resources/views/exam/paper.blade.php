@@ -147,7 +147,8 @@
                     </ul>
                 </div>
             </div>
-            <div id="question_action" class="d-flex gap-2 justify-content-between bg-light border-top border-dark py-2 px-4">
+            <div id="question_action"
+                class="d-flex gap-2 justify-content-between bg-light border-top border-dark py-2 px-4">
                 <div class="d-flex flex-wrap gap-2">
                     @if ($questions->get($questionKey - 1))
                         <a href="{{ route('exam.paper', [$paper, 'question_id' => $questions->get($questionKey - 1)]) }}"
@@ -302,14 +303,12 @@
             <script>
                 $(document).ready(function() {
                     $("#exam_statistics").modal('show');
+
+                    Fancybox.bind("[data-fancybox]", {});
                 });
             </script>
         @endif
         <script>
-            Fancybox.bind("[data-fancybox]", {
-                // Your custom options
-            });
-
             // Set the date we're counting down to
             var countDownDate = new Date("{{ session('exam.end_at') }}").getTime();
 
