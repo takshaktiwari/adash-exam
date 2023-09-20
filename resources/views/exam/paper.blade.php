@@ -118,27 +118,29 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
+
+            <ul class="navbar-nav ms-auto flex-fill d-flex me-3">
+                <li class="nav-item ms-auto">
+                    <a class="nav-link" href="javascript:void(0)">
+                        Time Left: <b id="time_left_timer"></b>
+                    </a>
+                </li>
+            </ul>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="mynavbar">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)">
-                            Time Left: <b id="time_left_timer"></b>
-                        </a>
-                    </li>
-                </ul>
+
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)" data-bs-toggle="modal"
                             data-bs-target="#instructions_modal">
-                            <i class="fa-solid fa-info-circle"></i>
+                            <i class="fa-solid fa-info-circle"></i> Instructions
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)" id="fullscreen_btn">
-                            <i class="fa-solid fa-expand"></i>
+                            <i class="fa-solid fa-expand"></i> Fullscreen
                         </a>
                     </li>
                 </ul>
@@ -181,22 +183,22 @@
                     </ul>
                 </div>
             </div>
-            <div id="question_action" class="d-flex justify-content-between bg-light border-top border-dark py-2 px-4">
+            <div id="question_action" class="d-flex gap-2 justify-content-between bg-light border-top border-dark py-2 px-4">
                 <div class="d-flex flex-wrap gap-2">
                     @if ($questions->get($questionKey - 1))
                         <a href="{{ route('exam.paper', [$paper, 'question_id' => $questions->get($questionKey - 1)]) }}"
-                            class="btn btn-info px-md-3 px-2">
+                            class="btn btn-info px-md-3 px-2 my-auto text-nowrap">
                             <i class="fa-solid fa-backward"></i> Prev
                         </a>
                     @endif
                     @if ($questions->get($questionKey + 1))
                         <a href="{{ route('exam.paper', [$paper, 'question_id' => $questions->get($questionKey + 1)]) }}"
-                            class="btn btn-info px-md-3 px-2">
+                            class="btn btn-info px-md-3 px-2 my-auto">
                             Next <i class="fa-solid fa-forward"></i>
                         </a>
                     @endif
                 </div>
-                <div class="d-flex flex-wrap gap-2">
+                <div class="d-flex flex-wrap gap-1">
                     <a href="{{ route('exam.question-mark', [$paper, $question, 'next_question_id' => $questions->get($questionKey + 1)]) }}"
                         class="btn bg-marked px-md-3 px-2">
                         <i class="fa-solid fa-marker"></i> Mark For Later
@@ -207,7 +209,7 @@
                         Save for review
                     </button>
                 </div>
-                <div class="my-auto">
+                <div class="d-flex flex-wrap gap-1">
                     <input type="hidden" name="mark_review" id="input_mark_review" value="">
                     <input type="hidden" name="next_question_id" value="{{ $questions->get($questionKey + 1) }}">
 
@@ -221,10 +223,16 @@
                         <button type="submit" class="btn btn-success px-md-3 px-2"
                             onclick="document.getElementById('input_mark_review').value = ''">
                             <i class="fa-solid fa-floppy-disk"></i>
-                            Save & Submit
+                            Save
                         </button>
                     @endif
 
+                    @if (!$questions->get($questionKey + 1) && $userQuestion?->user_option_id)
+                        <a href="" class="btn btn-primary px-md-3 px-2" data-bs-toggle="modal"
+                            data-bs-target="#exam_statistics">
+                            <i class="fa-solid fa-save"></i> Submit Exam
+                        </a>
+                    @endif
                 </div>
             </div>
         </form>

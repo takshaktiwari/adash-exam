@@ -47,7 +47,7 @@
                                 Questions</td>
                         </tr>
                         <tr>
-                            <th>Marked Obtained</th>
+                            <th>Marks Obtained</th>
                             <td>{{ $userPaper->questions_sum_marks }}</td>
                         </tr>
                     </table>
@@ -56,8 +56,7 @@
         </div>
     </div>
 
-    <hr />
-    <h4>Questions List</h4>
+    <h4 class="mt-3">Questions List</h4>
 
     @foreach ($paper->questions as $question)
         @php
@@ -102,7 +101,7 @@
                     {{ $question->correctOption->option_text }}
                 </div>
                 <div>
-                    <b>Explaination: </b>
+                    <b>Explanation: </b>
                     {{ $question->answer }}
                 </div>
             </div>
