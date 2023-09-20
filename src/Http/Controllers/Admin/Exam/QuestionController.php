@@ -32,9 +32,15 @@ class QuestionController extends Controller
             ->latest()
             ->paginate(100);
 
+        $questionGroups = collect([]);
+        if ($request->get('filter')) {
+            $questionGroups = QuestionGroup::select('id', 'name')->get();
+        }
+
         return View::first(['admin.exam.questions.index', 'exam::admin.exam.questions.index'])
             ->with([
-                'questions'   =>  $questions
+                'questions'   =>  $questions,
+                'questionGroups' => $questionGroups
             ]);
     }
 
