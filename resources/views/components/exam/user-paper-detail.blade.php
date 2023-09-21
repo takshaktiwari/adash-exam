@@ -74,12 +74,12 @@
                 <div>
                     <span class="btn btn-sm px-4 py-1 rounded-pill {{ $badgeClass }} text-white">
                         @if (!$question->userQuestion || $question->userQuestion?->status == 'marked')
-                        Not Answered
-                    @elseif($question->userQuestion->correct_option_id == $question->userQuestion->user_option_id)
-                        Correct
-                    @else
-                        Incorrect
-                    @endif
+                            Not Answered
+                        @elseif($question->userQuestion->correct_option_id == $question->userQuestion->user_option_id)
+                            Correct
+                        @else
+                            Incorrect
+                        @endif
                     </span>
                 </div>
                 <div>
@@ -98,7 +98,9 @@
                 @endif
                 <div class="mb-2">
                     <b>Correct Answer: </b>
-                    {{ $question->correctOption->option_text }}
+                    {{ $question->userQuestion?->correct_answer_text
+                        ? $question->userQuestion->correct_answer_text
+                        : $question->correctOption->option_text }}
                 </div>
                 <div>
                     <b>Explanation: </b>

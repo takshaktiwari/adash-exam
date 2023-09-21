@@ -73,10 +73,18 @@ class ExamController extends Controller
         $questionIds = collect([]);
         if ($paper->sections->count()) {
             foreach ($paper->sections as $section) {
-                $questionIds = $questionIds->merge($section->questions->pluck('id'));
+
+                $sectionQuestionIds = $section->questions->pluck('id');
+                if($paper->shuffle_questions) {
+                    $sectionQuestionIds = $sectionQuestionIds->shuffle();
+                }
+                $questionIds = $questionIds->merge($sectionQuestionIds);
             }
         } else {
             $questionIds = $paper->questions->pluck('id');
+            if($paper->shuffle_questions) {
+                $questionIds = $questionIds->shuffle();
+            }
         }
 
         $paper->unsetRelation('sections');

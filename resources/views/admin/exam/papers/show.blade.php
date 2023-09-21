@@ -56,6 +56,10 @@
                                 <td>{{ $paper->status() }}</td>
                             </tr>
                             <tr>
+                                <th>Shuffle Questions</th>
+                                <td>{{ $paper->shuffle_questions ? 'Yes' : 'No' }}</td>
+                            </tr>
+                            <tr>
                                 <th>Security Code</th>
                                 <td>{{ $paper->security_code }}</td>
                             </tr>

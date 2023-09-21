@@ -82,6 +82,16 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
+                        <label for="">Shuffle Questions<span class="text-danger">*</span></label>
+                        <select name="shuffle_questions" class="form-control" required>
+                            <option value="">-- Select --</option>
+                            <option value="1">Shuffle</option>
+                            <option value="0">Don't Shuffle</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
                         <label for="">Has Security Code (optional)</label>
                         <input type="text" name="security_code" value="{{ old('security_code') }}" class="form-control">
                         <span class="small">Security code need to be entered to start the exam if has code</span>

@@ -51,6 +51,7 @@ class PaperController extends Controller
             'minus_mark_percent'     =>  $request->post('minus_mark_percent'),
             'instruction'     =>  $request->post('instruction'),
             'status'     =>  $request->boolean('status'),
+            'shuffle_questions'     =>  $request->boolean('shuffle_questions'),
             'security_code'     =>  $request->post('security_code'),
             'attempts_limit'     =>  $request->post('attempts_limit'),
         ]);
@@ -103,6 +104,7 @@ class PaperController extends Controller
             'minus_mark_percent'     =>  $request->post('minus_mark_percent'),
             'instruction'     =>  $request->post('instruction'),
             'status'     =>  $request->boolean('status'),
+            'shuffle_questions'     =>  $request->boolean('shuffle_questions'),
             'security_code'     =>  $request->post('security_code'),
             'attempts_limit'     =>  $request->post('attempts_limit'),
         ]);

@@ -48,77 +48,95 @@
     @endpush
 
 
-    <div class="row">
-        <div class="col-md-7">
-            <form method="POST" action="{{ route('admin.exam.questions.store') }}" class="card shadow-sm" enctype="multipart/form-data">
-                @csrf
-                <div class="card-body">
+    <form method="POST" action="{{ route('admin.exam.questions.store') }}" class="card shadow-sm"
+        enctype="multipart/form-data">
+        @csrf
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label for="">Question <span class="text-danger">*</span></label>
-                        <textarea name="question" rows="2" class="form-control" placeholder="Write your question" required="">{{ old('question') }}</textarea>
+                        <textarea name="question" rows="2" class="form-control text-editor" placeholder="Write your question">{{ old('question') }}</textarea>
                     </div>
-                    <div class="form-group">
-                        <label for="">Image </label>
-                        <input type="file" name="image" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label for="">Marks <span class="text-danger">*</span></label>
-                        <input type="number" name="marks" class="form-control" required placeholder="eg. 2"
-                            value="{{ old('marks') }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="">
-                            Question Choices <span class="text-danger">*</span>
-
-                            <a href="javascript:void(0)" id="add_option_btn" class="badge bg-primary">+ Add More</a>
-                        </label>
-                        <div id="question_options">
-                            @for ($i = 1; $i <= 4; $i++)
-                                <div class="d-flex mb-2 option">
-                                    <div class="flex-fill">
-                                        <input type="text" name="ques_option[{{ $i }}]"
-                                            class="form-control rounded-0"
-                                            placeholder="Option Choice {{ $i }}"
-                                            value="{{ old('ques_option')[$i] ?? '' }}" maxlength="250" required="">
-                                        <a href="javascript:void(0)" class="fw-bold text-danger small remove_option">
-                                            <i class="fas fa-times"></i> Remove
-                                        </a>
-                                    </div>
-
-                                    <label class="mb-0">
-                                        <input type="radio" name="correct_ans" value="{{ $i }}"
-                                            required="">
-                                        <div class="answercheck form-control rounded-0"></div>
-                                    </label>
-                                </div>
-                            @endfor
-                        </div>
-                    </div>
+                </div>
+                <div class="col-md-6">
                     <div class="form-group">
                         <label for="">Descriptive Answer </label>
-                        <textarea name="answer" rows="4" class="form-control" placeholder="Describe your answer" maxlength="499">{{ old('answer') }}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="">Question Groups <span class="text-danger">*</span></label>
-                        <select name="question_group_id[]" id="question_group_id" class="form-control select2" multiple
-                            required>
-                            <option value="">-- Select --</option>
-                            @foreach ($questionGroups as $group)
-                                <option value="{{ $group->id }}">
-                                    {{ $group->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <textarea name="answer" rows="4" class="form-control text-editor" placeholder="Describe your answer"
+                            maxlength="499">{{ old('answer') }}</textarea>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <input type="submit" class="btn btn-dark px-4">
+            </div>
+            <div class="form-group">
+                <label for="">Question Groups <span class="text-danger">*</span></label>
+                <select name="question_group_id[]" id="question_group_id" class="form-control select2" multiple
+                    required>
+                    <option value="">-- Select --</option>
+                    @foreach ($questionGroups as $group)
+                        <option value="{{ $group->id }}">
+                            {{ $group->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Image </label>
+                <input type="file" name="image" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="">Marks <span class="text-danger">*</span></label>
+                <input type="number" name="marks" class="form-control" required placeholder="eg. 2"
+                    value="{{ old('marks') }}">
+            </div>
+            <div class="form-group">
+                <label for="">
+                    Question Choices <span class="text-danger">*</span>
+
+                    <a href="javascript:void(0)" id="add_option_btn" class="badge bg-primary">+ Add More</a>
+                </label>
+                <div id="question_options">
+                    @for ($i = 1; $i <= 4; $i++)
+                        <div class="d-flex mb-2 option">
+                            <div class="flex-fill">
+                                <input type="text" name="ques_option[{{ $i }}]"
+                                    class="form-control rounded-0" placeholder="Option Choice {{ $i }}"
+                                    value="{{ old('ques_option')[$i] ?? '' }}" maxlength="250" required="">
+                                <a href="javascript:void(0)" class="fw-bold text-danger small remove_option">
+                                    <i class="fas fa-times"></i> Remove
+                                </a>
+                            </div>
+
+                            <label class="mb-0">
+                                <input type="radio" name="correct_ans" value="{{ $i }}" required="">
+                                <div class="answercheck form-control rounded-0"></div>
+                            </label>
+                        </div>
+                    @endfor
                 </div>
-            </form>
+            </div>
+
+
         </div>
-    </div>
+        <div class="card-footer">
+            <input type="submit" class="btn btn-dark px-4">
+        </div>
+    </form>
 
     @push('scripts')
+        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+        <script>
+            tinymce.init({
+                selector: '.text-editor',
+                plugins: 'print preview paste importcss searchreplace autolink autosave directionality code visualblocks visualchars fullscreen image link codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap emoticons',
+                imagetools_cors_hosts: ['picsum.photos'],
+                menubar: 'file edit view insert format tools table help',
+                toolbar: 'bold italic underline strikethrough alignleft aligncenter alignright alignjustify numlist bullist charmap outdent indent | fontselect fontsizeselect formatselect | forecolor backcolor |  emoticons preview link',
+                toolbar_sticky: true,
+                autosave_ask_before_unload: true,
+                height: 250,
+                toolbar_mode: 'sliding',
+            });
+        </script>
         <script>
             $(document).ready(function() {
                 $("#add_option_btn").click(function() {
@@ -146,7 +164,7 @@
                     `);
                 });
 
-                $('#question_options').on('click', '.remove_option', function(){
+                $('#question_options').on('click', '.remove_option', function() {
                     $(this).parent().parent().remove();
                 });
             });

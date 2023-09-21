@@ -20,6 +20,7 @@ return new class () extends Migration {
             $table->dateTime('activate_at')->comment('date time');
             $table->dateTime('expire_at')->comment('date time');
             $table->text('instruction')->nullable();
+            $table->boolean('shuffle_questions')->nullable()->default(false);
             $table->boolean('status')->nullable()->default(false);
             $table->string('security_code')->nullable()->default(null);
             $table->integer('attempts_limit')->nullable()->default(null);
