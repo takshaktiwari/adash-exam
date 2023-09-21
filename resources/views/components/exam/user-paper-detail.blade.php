@@ -102,10 +102,12 @@
                         ? $question->userQuestion->correct_answer_text
                         : $question->correctOption->option_text }}
                 </div>
-                <div>
-                    <b>Explanation: </b>
-                    {{ $question->answer }}
-                </div>
+                @if ($question->answer)
+                    <div>
+                        <b>Explanation: </b>
+                        {{ $question->answer }}
+                    </div>
+                @endif
             </div>
         </div>
     @endforeach
