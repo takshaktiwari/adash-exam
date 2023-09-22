@@ -111,13 +111,13 @@
         }
     </style>
     <x-exam-exam:exam-navbar />
-    <div id="wrapper" class="d-flex">
+    <div id="wrapper" class="d-flex" onselectstart="return false" onpaste="return false;" onCopy="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off>
         @csrf
         <x-exam-exam:exam-sidebar :paper="$paper" :userQuestions="$userQuestions" :question="$question" />
 
         <form action="{{ route('exam.question-save', [$paper, $question]) }}" method="POST" class="flex-fill">
             @csrf
-            <div id="question_area" class="flex-fill px-4 pt-4">
+            <div id="question_area" class="flex-fill px-4 pt-4" >
                 <div class="question">
                     <div class="d-flex gap-2 mb-4">
                         <b>{{ $questionKey + 1 }}.</b>

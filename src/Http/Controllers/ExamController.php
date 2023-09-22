@@ -32,7 +32,7 @@ class ExamController extends Controller
 
     public function authenticate(Request $request, Paper $paper)
     {
-        if($paper->security_code != $request->input('security_code')) {
+        if ($paper->security_code != $request->input('security_code')) {
             return redirect()->route('exam.papers')->withErrors('SORRY !! Security code is not correct. Please try again.');
         }
 
@@ -75,14 +75,14 @@ class ExamController extends Controller
             foreach ($paper->sections as $section) {
 
                 $sectionQuestionIds = $section->questions->pluck('id');
-                if($paper->shuffle_questions) {
+                if ($paper->shuffle_questions) {
                     $sectionQuestionIds = $sectionQuestionIds->shuffle();
                 }
                 $questionIds = $questionIds->merge($sectionQuestionIds);
             }
         } else {
             $questionIds = $paper->questions->pluck('id');
-            if($paper->shuffle_questions) {
+            if ($paper->shuffle_questions) {
                 $questionIds = $questionIds->shuffle();
             }
         }
@@ -121,15 +121,21 @@ class ExamController extends Controller
             return $question_id == $item;
         });
 
-        $paper->load('sections.questions')
-            ->loadCount('sections')
+        $paper->loadCount('sections')
             ->loadCount('questions')
             ->loadSum('questions', 'marks');
 
+        $questionsIdsForFilter = $questions->implode(',');
         if ($paper->sections_count) {
-            $paper->load('sections.questions');
+            $paper->load(['sections' => function ($query) use ($questionsIdsForFilter) {
+                $query->with(['questions' => function ($query) use ($questionsIdsForFilter) {
+                    $query->orderByRaw(\DB::raw("FIELD(questions.id, {$questionsIdsForFilter})"));
+                }]);
+            }]);
         } else {
-            $paper->load('questions');
+            $paper->load(['questions' => function ($query) use ($questionsIdsForFilter) {
+                $query->orderByRaw(\DB::raw("FIELD(questions.id, {$questionsIdsForFilter})"));
+            }]);
         }
 
         $question = Question::with('options')->with('sections')->find($question_id);
@@ -251,6 +257,4 @@ class ExamController extends Controller
 
         return redirect()->route('exam.papers')->withSuccess('SUCCESS !! Exam has been submitted successfully.');
     }
-
-
 }

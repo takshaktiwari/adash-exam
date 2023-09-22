@@ -1,4 +1,4 @@
-<div {{ $attributes->merge(['class' => '']) }}>
+<div {{ $attributes->merge(['class' => '']) }} onselectstart="return false" onpaste="return false;" onCopy="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off>
     <div class="row">
         <div class="col-md-6">
             <div class="card shadow-sm">
