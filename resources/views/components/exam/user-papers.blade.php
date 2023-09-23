@@ -31,4 +31,8 @@
             @endforeach
         </tbody>
     </table>
+
+    <div class="mt-4">
+        {{ $userPapers->links() }}
+    </div>
 </div>

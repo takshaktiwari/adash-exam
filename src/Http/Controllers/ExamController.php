@@ -129,12 +129,12 @@ class ExamController extends Controller
         if ($paper->sections_count) {
             $paper->load(['sections' => function ($query) use ($questionsIdsForFilter) {
                 $query->with(['questions' => function ($query) use ($questionsIdsForFilter) {
-                    $query->orderByRaw(\DB::raw("FIELD(questions.id, {$questionsIdsForFilter})"));
+                    $query->orderByRaw("FIELD(questions.id, {$questionsIdsForFilter})");
                 }]);
             }]);
         } else {
             $paper->load(['questions' => function ($query) use ($questionsIdsForFilter) {
-                $query->orderByRaw(\DB::raw("FIELD(questions.id, {$questionsIdsForFilter})"));
+                $query->orderByRaw("FIELD(questions.id, {$questionsIdsForFilter})");
             }]);
         }
 
@@ -226,6 +226,13 @@ class ExamController extends Controller
 
     public function submit(Paper $paper)
     {
+        if (!session('exam.paper.id') || !session('exam.user_paper.id')) {
+            return redirect('/')->withErrors('SORRY !! You need to start the exam again');
+        }
+        if ($paper->security_code && !session('exam.authenticated')) {
+            return redirect()->route('exam.papers')->withErrors('SORRY !! Please enter exam security key / code.');
+        }
+
         $userPaper = UserPaper::find(session('exam.user_paper.id'));
         $userPaper->update(['submit_at' => now()]);
 
