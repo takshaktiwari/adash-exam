@@ -290,4 +290,18 @@ class QuestionController extends Controller
 
         return true;
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'question_ids' => 'required'
+        ]);
+
+        $question_ids = explode(',', $request->question_ids);
+        if (count($question_ids)) {
+            Question::whereIn('id', $question_ids)->delete();
+        }
+
+        return redirect()->route('admin.exam.questions.index')->withSuccess('SUCCESS !! Selected questions are successfully deleted');
+    }
 }

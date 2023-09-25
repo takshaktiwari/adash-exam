@@ -74,7 +74,14 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input check_all_question_ids" type="checkbox">
+                                    #
+                                </label>
+                            </div>
+                        </th>
                         <th>Question</th>
                         <th>Groups</th>
                         <th>Marks</th>
@@ -84,7 +91,14 @@
                 <tbody>
                     @foreach ($questions as $key => $question)
                         <tr>
-                            <td>{{ $key + 1 }}</td>
+                            <td>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input question_ids" type="checkbox" value="{{ $question->id }}">
+                                        {{ $key + 1 }}
+                                    </label>
+                                </div>
+                            </td>
                             <td>
                                 {{ $question->question }}
                             </td>
@@ -123,9 +137,36 @@
                 </tbody>
             </table>
         </div>
-        <div class="card-footer">
+        <div class="card-footer d-flex flex-wrap justify-content-between">
             {{ $questions->links() }}
+            <div class="actions">
+                <button class="btn btn-danger px-3 delete_questions_btn">
+                    <i class="fas fa-trash"></i> Delete Checked
+                </button>
+            </div>
         </div>
     </div>
 
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                $(".check_all_question_ids").click(function() {
+                    $('.question_ids').not(this).prop('checked', this.checked);
+                });
+
+                $(".delete_questions_btn").click(function() {
+                    var questionIds = $(".question_ids:checked").map(function() {
+                        return $(this).val();
+                    }).get();
+
+                    if(!questionIds.length){
+                        alert('Please select questions.');
+                        return false;
+                    }
+
+                    window.location.href = "{{ route('admin.exam.questions.bulk-delete') }}?question_ids="+encodeURIComponent(questionIds);
+                });
+            });
+        </script>
+    @endpush
 </x-admin.layout>

@@ -18,6 +18,7 @@ Route::middleware('web')->group(function () {
             Route::get('questions/upload', [QuestionController::class, 'upload'])->name('questions.upload');
             Route::post('questions/upload', [QuestionController::class, 'uploadDo'])->name('questions.upload.do');
             Route::get('questions/sample-download', [QuestionController::class, 'sampleDownload'])->name('questions.sample-download');
+            Route::get('questions/bulk-delete', [QuestionController::class, 'bulkDelete'])->name('questions.bulk-delete');
             Route::resource('questions', QuestionController::class);
 
             Route::resource('question-groups', QuestionGroupController::class);
