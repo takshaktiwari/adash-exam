@@ -20,7 +20,7 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <div class="mb-4">{!! $question->question !!}</div>
+            <div class="mb-4">{!! nl2br($question->question) !!}</div>
             <img src="{{ storage($question->image) }}" alt="question img" class="rounded-2" style="max-height: 200px">
             <hr />
             <p class="mb-1"><b>Options:</b></p>

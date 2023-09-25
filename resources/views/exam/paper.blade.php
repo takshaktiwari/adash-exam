@@ -111,18 +111,19 @@
         }
     </style>
     <x-exam-exam:exam-navbar />
-    <div id="wrapper" class="d-flex" onselectstart="return false" onpaste="return false;" onCopy="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off>
+    <div id="wrapper" class="d-flex" onselectstart="return false" onpaste="return false;" onCopy="return false"
+        onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off>
         @csrf
         <x-exam-exam:exam-sidebar :paper="$paper" :userQuestions="$userQuestions" :question="$question" />
 
-        <form action="{{ route('exam.question-save', [$paper, $question]) }}" method="POST" class="flex-fill">
+        <form action="{{ route('exam.question-save', [$paper, $question]) }}" method="POST" class="flex-fill" id="question_form">
             @csrf
-            <div id="question_area" class="flex-fill px-4 pt-4" >
+            <div id="question_area" class="flex-fill px-4 pt-4">
                 <div class="question">
                     <div class="d-flex gap-2 mb-4">
                         <b>{{ $questionKey + 1 }}.</b>
                         <div>
-                            {!! $question->question !!}
+                            {!! nl2br($question->question) !!}
                         </div>
                     </div>
                     @if ($question->image)
@@ -152,23 +153,23 @@
                 <div class="d-flex flex-wrap gap-2">
                     @if ($questions->get($questionKey - 1))
                         <a href="{{ route('exam.paper', [$paper, 'question_id' => $questions->get($questionKey - 1)]) }}"
-                            class="btn btn-info px-md-3 px-2 my-auto text-nowrap">
+                            class="btn btn-info px-md-3 px-2 my-auto text-nowrap action_btn">
                             <i class="fa-solid fa-backward"></i> Prev
                         </a>
                     @endif
                     @if ($questions->get($questionKey + 1))
                         <a href="{{ route('exam.paper', [$paper, 'question_id' => $questions->get($questionKey + 1)]) }}"
-                            class="btn btn-info px-md-3 px-2 my-auto">
+                            class="btn btn-info px-md-3 px-2 my-auto action_btn">
                             Next <i class="fa-solid fa-forward"></i>
                         </a>
                     @endif
                 </div>
                 <div class="d-flex flex-wrap gap-1">
                     <a href="{{ route('exam.question-mark', [$paper, $question, 'next_question_id' => $questions->get($questionKey + 1)]) }}"
-                        class="btn bg-marked px-md-3 px-2">
+                        class="btn bg-marked px-md-3 px-2 action_btn">
                         <i class="fa-solid fa-marker"></i> Mark For Later
                     </a>
-                    <button type="submit" class="btn bg-mark_review px-md-3 px-2"
+                    <button type="submit" class="btn bg-mark_review px-md-3 px-2 action_btn"
                         onclick="document.getElementById('input_mark_review').value = 1">
                         <i class="fa-solid fa-floppy-disk"></i>
                         Save for review
@@ -179,13 +180,13 @@
                     <input type="hidden" name="next_question_id" value="{{ $questions->get($questionKey + 1) }}">
 
                     @if ($questions->get($questionKey + 1))
-                        <button type="submit" class="btn btn-success px-md-3 px-2"
+                        <button type="submit" class="btn btn-success px-md-3 px-2 action_btn"
                             onclick="document.getElementById('input_mark_review').value = ''">
                             <i class="fa-solid fa-floppy-disk"></i>
                             Save & Next
                         </button>
                     @else
-                        <button type="submit" class="btn btn-success px-md-3 px-2"
+                        <button type="submit" class="btn btn-success px-md-3 px-2 action_btn"
                             onclick="document.getElementById('input_mark_review').value = ''">
                             <i class="fa-solid fa-floppy-disk"></i>
                             Save
@@ -303,12 +304,22 @@
             <script>
                 $(document).ready(function() {
                     $("#exam_statistics").modal('show');
-
                     Fancybox.bind("[data-fancybox]", {});
                 });
             </script>
         @endif
         <script>
+            $("a.action_btn").click(function() {
+                $(this).addClass('disabled');
+                $(this).html('Please wait');
+            });
+            $("button.action_btn").click(function() {
+                if($("#question_form")[0].checkValidity()){
+                    $(this).addClass('disabled');
+                    $(this).html('Please wait');
+                }
+            });
+
             // Set the date we're counting down to
             var countDownDate = new Date("{{ session('exam.end_at') }}").getTime();
 

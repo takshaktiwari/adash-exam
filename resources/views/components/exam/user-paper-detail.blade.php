@@ -87,7 +87,7 @@
                 </div>
             </div>
             <div class="card-body border-bottom">
-                {{ strip_tags($question->question) }}
+                {!! nl2br($question->question) !!}
             </div>
             <div class="card-body">
                 @if ($question->userQuestion && $question->userQuestion->status == 'answered')
