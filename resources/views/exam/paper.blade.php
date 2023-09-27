@@ -348,6 +348,14 @@
 
                 document.getElementById("time_left_timer").innerHTML = timerText;
 
+                if(distance/1000 < 300 && distance/1000 > 299){
+                    alert('Time is ticking. You have only 5 mins left to complete the exam.');
+                }
+
+                if(distance/1000 < 120 && distance/1000 > 119){
+                    alert('Time is ticking. You have only 2 mins left to complete the exam.');
+                }
+
                 // If the count down is finished, write some text
                 if (distance < 0) {
                     clearInterval(x);
