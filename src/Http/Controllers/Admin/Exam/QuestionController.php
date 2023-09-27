@@ -106,6 +106,7 @@ class QuestionController extends Controller
 
     public function edit($id)
     {
+        cache()->forget('question_' . $id);
         $question = Question::find($id);
         $questionGroups = QuestionGroup::get();
         return View::first(['admin.exam.questions.edit', 'exam::admin.exam.questions.edit'])->with([
@@ -154,6 +155,7 @@ class QuestionController extends Controller
             }
 
             $question->questionGroups()->sync($request->question_group_id);
+            cache()->forget('question_' . $question->id);
 
             return redirect()->back()->withErrors('UPDATED !! Question is successfully updated');
         } catch (\Exception $e) {
@@ -164,6 +166,7 @@ class QuestionController extends Controller
     public function destroy($id)
     {
         try {
+            cache()->forget('question_' . $id);
             Question::where('id', $id)->delete();
             QuestionOption::where('question_id', $id)->delete();
             return redirect()->back()->withErrors('DELETED !! Question is successfully deleted');

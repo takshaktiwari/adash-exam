@@ -121,28 +121,51 @@ class ExamController extends Controller
             return $question_id == $item;
         });
 
-        $paper->loadCount('sections')
-            ->loadCount('questions')
-            ->loadSum('questions', 'marks');
-
         $questionsIdsForFilter = $questions->implode(',');
-        if ($paper->sections_count) {
-            $paper->load(['sections' => function ($query) use ($questionsIdsForFilter) {
-                $query->with(['questions' => function ($query) use ($questionsIdsForFilter) {
-                    $query->orderByRaw("FIELD(questions.id, {$questionsIdsForFilter})");
-                }]);
-            }]);
-        } else {
-            $paper->load(['questions' => function ($query) use ($questionsIdsForFilter) {
-                $query->orderByRaw("FIELD(questions.id, {$questionsIdsForFilter})");
-            }]);
-        }
 
-        $question = Question::with('options')->with('sections')->find($question_id);
+        $userPaper = cache()->remember(
+            'user_paper_' . session('exam.user_paper.id'),
+            60 * 60 * 6, // for 6 hrs
+            function () {
+                return UserPaper::query()
+                    ->where('id', session('exam.user_paper.id'))
+                    ->first();
+            }
+        );
 
-        $userPaper = UserPaper::query()
-            ->where('id', session('exam.user_paper.id'))
-            ->first();
+        $paper->loadCount('sections');
+
+        $paper = cache()->remember(
+            'user_paper_paper_' . session('exam.user_paper.id'),
+            60 * 60 * 6, // for 6 hrs
+            function () use ($paper, $questionsIdsForFilter) {
+                return Paper::where('id', $paper->id)
+                    ->withCount('sections')
+                    ->withCount('questions')
+                    ->withSum('questions', 'marks')
+                    ->when($paper->sections_count, function ($query) use ($questionsIdsForFilter) {
+                        $query->with(['sections' => function ($query) use ($questionsIdsForFilter) {
+                            $query->with(['questions' => function ($query) use ($questionsIdsForFilter) {
+                                $query->orderByRaw("FIELD(questions.id, {$questionsIdsForFilter})");
+                            }]);
+                        }]);
+                    })
+                    ->when(!$paper->sections_count, function ($query) use ($questionsIdsForFilter) {
+                        $query->with(['questions' => function ($query) use ($questionsIdsForFilter) {
+                            $query->orderByRaw("FIELD(questions.id, {$questionsIdsForFilter})");
+                        }]);
+                    })
+                    ->first();
+            }
+        );
+
+        $question = cache()->remember(
+            'question_' . $question_id,
+            60 * 60 * 6, // for 6 hrs
+            function () use ($question_id) {
+                return Question::with('options')->with('sections')->find($question_id);
+            }
+        );
 
         $userQuestion = UserQuestion::query()
             ->where('user_paper_id', $userPaper->id)
