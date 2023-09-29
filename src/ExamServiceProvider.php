@@ -19,6 +19,7 @@ class ExamServiceProvider extends ServiceProvider
             View\Components\Exam\Papers::class,
             View\Components\Exam\UserPapers::class,
             View\Components\Exam\UserPaperDetail::class,
+            View\Components\Exam\UserQuestionCard::class,
         ]);
 
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');

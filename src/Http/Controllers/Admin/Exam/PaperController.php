@@ -120,6 +120,7 @@ class PaperController extends Controller
 
     public function questionsEdit(Paper $paper)
     {
+        $paper->loadCount('questions');
         $questionGroups = QuestionGroup::get();
         return View::first(['admin.exam.papers.questions_edit', 'exam::admin.exam.papers.questions_edit'])->with([
             'paper' =>  $paper,

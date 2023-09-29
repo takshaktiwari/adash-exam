@@ -17,8 +17,9 @@
 
 
     <div class="card shadow-sm">
-        <div class="card-header">
-            <h5 class="my-auto">{{ $paper->title }}</h5>
+        <div class="card-header border-bottom border-dark">
+            <h5 class="">{{ $paper->title }}</h5>
+            <p class="mb-0"><b>Questions: </b> {{ $paper->questions_count }}</p>
         </div>
         <div class="card-header d-flex">
             <div style="width: 350px">

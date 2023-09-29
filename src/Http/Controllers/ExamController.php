@@ -50,6 +50,11 @@ class ExamController extends Controller
         if ($paper->security_code && !session('exam.authenticated')) {
             return redirect()->route('exam.papers')->withErrors('SORRY !! Please enter exam security key / code.');
         }
+
+        if(session('exam.paper.id')) {
+            return redirect()->route('exam.paper', [session('exam.paper.id')]);
+        }
+
         $paper->loadCount('sections')->loadCount('questions')->loadSum('questions', 'marks');
         return View::first(['exam.instructions', 'exam::exam.instructions'])->with([
             'paper' =>  $paper,
@@ -90,9 +95,9 @@ class ExamController extends Controller
         $paper->unsetRelation('sections');
         $paper->unsetRelation('questions');
         $arr = session('exam', []);
-        $arr['paper'] = $paper;
-        $arr['user_paper'] = $userPaper;
-        $arr['questions'] = $questionIds;
+        $arr['paper'] = $paper->toArray();
+        $arr['user_paper'] = $userPaper->toArray();
+        $arr['questions'] = $questionIds->toArray();
         $arr['start_at'] = now()->format('Y-m-d H:i:s');
         $arr['end_at'] = now()->addMinutes($paper->total_time)->format('Y-m-d H:i:s');
 
@@ -104,7 +109,7 @@ class ExamController extends Controller
     public function paper(Request $request, Paper $paper)
     {
         if (!session('exam.paper.id') || !session('exam.user_paper.id')) {
-            return redirect('/')->withErrors('SORRY !! You need to start the exam again');
+            return redirect()->route('exam.papers')->withErrors('SORRY !! You need to start the exam again');
         }
         if ($paper->security_code && !session('exam.authenticated')) {
             return redirect()->route('exam.papers')->withErrors('SORRY !! Please enter exam security key / code.');
@@ -193,6 +198,10 @@ class ExamController extends Controller
 
     public function questionSave(Request $request, Paper $paper, Question $question)
     {
+        if (!session('exam.paper.id') || !session('exam.user_paper.id')) {
+            return redirect()->route('exam.papers')->withErrors('SORRY !! You need to start the exam again');
+        }
+
         $request->validate([
             'user_option' => 'required|numeric',
             'next_question_id' => 'nullable|numeric'
@@ -250,7 +259,7 @@ class ExamController extends Controller
     public function submit(Paper $paper)
     {
         if (!session('exam.paper.id') || !session('exam.user_paper.id')) {
-            return redirect('/')->withErrors('SORRY !! You need to start the exam again');
+            return redirect()->route('exam.papers')->withErrors('SORRY !! You need to start the exam again');
         }
         if ($paper->security_code && !session('exam.authenticated')) {
             return redirect()->route('exam.papers')->withErrors('SORRY !! Please enter exam security key / code.');

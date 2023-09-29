@@ -42,6 +42,7 @@ class PaperSectionController extends Controller
 
     public function show(Paper $paper, PaperSection $section)
     {
+        $section->loadCount('questions');
         $questionGroups = QuestionGroup::get();
         return View::first(['admin.exam.papers.sections.show', 'exam::admin.exam.papers.sections.show'])
             ->with([

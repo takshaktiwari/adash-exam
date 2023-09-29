@@ -62,4 +62,14 @@ class Question extends Model
     {
         return $this->hasOne(UserQuestion::class);
     }
+
+    /**
+     * The papers that belong to the Question
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function papers(): BelongsToMany
+    {
+        return $this->belongsToMany(Paper::class, 'paper_question_section');
+    }
 }

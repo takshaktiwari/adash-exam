@@ -175,7 +175,7 @@
                         Save for review
                     </button>
                 </div>
-                <div class="d-flex flex-wrap gap-1">
+                <div class="d-flex flex-wrap gap-1" >
                     <input type="hidden" name="mark_review" id="input_mark_review" value="">
                     <input type="hidden" name="next_question_id" value="{{ $questions->get($questionKey + 1) }}">
 

@@ -28,14 +28,27 @@ class UserPaperController extends Controller
 
     public function show(Paper $paper, UserPaper $userPaper)
     {
-        $paper->load(['questions' => function ($query) use ($userPaper) {
-            $query->with('correctOption');
-            $query->with(['userQuestion' => function ($query) use ($userPaper) {
-                $query->where('user_paper_id', $userPaper->id);
-            }]);
-        }])
-            ->loadCount('questions')
+        $paper->loadCount('questions')
+            ->loadCount('sections')
             ->loadSum('questions', 'marks');
+
+        if($paper->sections_count) {
+            $paper->load(['sections' => function ($query) use ($userPaper) {
+                $query->with(['questions' => function ($query) use ($userPaper) {
+                    $query->with('correctOption');
+                    $query->with(['userQuestion' => function ($query) use ($userPaper) {
+                        $query->where('user_paper_id', $userPaper->id);
+                    }]);
+                }]);
+            }]);
+        } else {
+            $paper->load(['questions' => function ($query) use ($userPaper) {
+                $query->with('correctOption');
+                $query->with(['userQuestion' => function ($query) use ($userPaper) {
+                    $query->where('user_paper_id', $userPaper->id);
+                }]);
+            }]);
+        }
 
         $userPaper->loadSum('questions', 'marks');
 
@@ -44,6 +57,4 @@ class UserPaperController extends Controller
             'paper' =>  $paper,
         ]);
     }
-
-
 }

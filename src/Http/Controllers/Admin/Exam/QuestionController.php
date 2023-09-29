@@ -240,6 +240,7 @@ class QuestionController extends Controller
         }
 
         $questions = Question::query()
+            ->with('papers:id,title')
             ->with('questionGroups:id,name')
             ->when($request->get('search'), function ($query) use ($request) {
                 $query->where('question', 'LIKE', '%' . $request->search . '%');
@@ -280,16 +281,14 @@ class QuestionController extends Controller
             }
 
             return true;
-        }
-
-
-        $paper = Paper::find($request->get('paper_id'));
-        if ($paper->questions->pluck('id')->contains($request->get('question_id'))) {
-            $paper->questions()->detach($request->get('question_id'));
         } else {
-            $paper->questions()->attach($request->get('question_id'));
+            $model = Paper::find($request->get('paper_id'));
+            if ($model->questions->pluck('id')->contains($request->get('question_id'))) {
+                $model->questions()->detach($request->get('question_id'));
+            } else {
+                $model->questions()->attach($request->get('question_id'));
+            }
         }
-
 
         return true;
     }
