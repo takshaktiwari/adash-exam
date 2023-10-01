@@ -27,3 +27,11 @@ Add routes to sidebar in admin (components/admin/sidebar.php)
 To customize views publish views and you will get exam layout in layouts folder, components and admin pages will be in components/exam and admin/exam respectively.
 
     php artisan vendor:publish --provider="Takshak\Exam\ExamServiceProvider"
+
+Additionally you can publish just required assets. 
+
+- Publish Seeders: `php artisan vendor:publish --tag="adash-exam-seeds". You will get the seeders in seeders folder.
+
+- Publish Routes: `php artisan vendor:publish --tag="adash-exam-routes". You will get a file named *exam.php* in routes folder.
+
+- Publish Views: `php artisan vendor:publish --tag="adash-exam-views". You will get the views in *exam* folder in components and in admin folder.
