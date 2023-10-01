@@ -1,8 +1,5 @@
 <x-admin.layout>
-    <x-admin.breadcrumb title='Papers Questions' :links="[
-        ['text' => 'Papers', 'url' => route('admin.exam.papers.index')],
-        ['text' => 'Questions'],
-    ]" :actions="[
+    <x-admin.breadcrumb title='Papers Questions' :links="[['text' => 'Papers', 'url' => route('admin.exam.papers.index')], ['text' => 'Questions']]" :actions="[
         [
             'text' => 'Add Paper',
             'icon' => 'fas fa-plus',
@@ -12,14 +9,19 @@
     ]" />
 
     @push('styles')
-        <script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.5"
+            integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous">
+        </script>
     @endpush
 
 
     <div class="card shadow-sm">
         <div class="card-header border-bottom border-dark">
             <h5 class="">{{ $paper->title }}</h5>
-            <p class="mb-0"><b>Questions: </b> {{ $paper->questions_count }}</p>
+            <p class="mb-0">
+                <b>Questions: </b>
+                <span id="questions_count">{{ $paper->questions_count }}</span>
+            </p>
         </div>
         <div class="card-header d-flex">
             <div style="width: 350px">
@@ -47,7 +49,9 @@
 
     <form method="POST" action="{{ route('admin.exam.papers.questions.update', [$paper]) }}" class="card shadow-sm">
         @csrf
-        <div class="card-body" hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}" hx-trigger="load" id="questions">
+        <div class="card-body" hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
+            hx-trigger="load" id="questions">
         </div>
     </form>
+
 </x-admin.layout>

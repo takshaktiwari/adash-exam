@@ -42,8 +42,20 @@ class ExamController extends Controller
         return redirect()->route('exam.instructions', [$paper]);
     }
 
-    public function instructions(Paper $paper)
+    public function instructions($paper_id)
     {
+        $paper = cache()->remember(
+            'paper_' . $paper_id,
+            60 * 60 * 6, // for 6 hrs
+            function () use ($paper_id) {
+                return Paper::where('id', $paper_id)
+                    ->withCount('sections')
+                    ->withCount('questions')
+                    ->withSum('questions', 'marks')
+                    ->firstOrFail();
+            }
+        );
+
         if (!$paper->isActive()) {
             return redirect()->route('exam.papers')->withErrors('SORRY !! Exam is not activated yet.');
         }
@@ -51,11 +63,10 @@ class ExamController extends Controller
             return redirect()->route('exam.papers')->withErrors('SORRY !! Please enter exam security key / code.');
         }
 
-        if(session('exam.paper.id')) {
+        if (session('exam.paper.id')) {
             return redirect()->route('exam.paper', [session('exam.paper.id')]);
         }
 
-        $paper->loadCount('sections')->loadCount('questions')->loadSum('questions', 'marks');
         return View::first(['exam.instructions', 'exam::exam.instructions'])->with([
             'paper' =>  $paper,
         ]);
@@ -106,8 +117,20 @@ class ExamController extends Controller
         return redirect()->route('exam.paper', [$paper]);
     }
 
-    public function paper(Request $request, Paper $paper)
+    public function paper(Request $request, $paper_id)
     {
+        $paper = cache()->remember(
+            'paper_' . $paper_id,
+            60 * 60 * 6, // for 6 hrs
+            function () use ($paper_id) {
+                return Paper::where('id', $paper_id)
+                    ->withCount('sections')
+                    ->withCount('questions')
+                    ->withSum('questions', 'marks')
+                    ->firstOrFail();
+            }
+        );
+
         if (!session('exam.paper.id') || !session('exam.user_paper.id')) {
             return redirect()->route('exam.papers')->withErrors('SORRY !! You need to start the exam again');
         }
@@ -138,8 +161,6 @@ class ExamController extends Controller
             }
         );
 
-        $paper->loadCount('sections');
-
         $paper = cache()->remember(
             'user_paper_paper_' . session('exam.user_paper.id'),
             60 * 60 * 6, // for 6 hrs
@@ -168,7 +189,10 @@ class ExamController extends Controller
             'question_' . $question_id,
             60 * 60 * 6, // for 6 hrs
             function () use ($question_id) {
-                return Question::with('options')->with('sections')->find($question_id);
+                return Question::with('options')
+                    ->with('correctOption')
+                    ->with('sections')
+                    ->find($question_id);
             }
         );
 
@@ -196,8 +220,31 @@ class ExamController extends Controller
         ]);
     }
 
-    public function questionSave(Request $request, Paper $paper, Question $question)
+    public function questionSave(Request $request, $paper_id, $question_id)
     {
+        $paper = cache()->remember(
+            'paper_' . $paper_id,
+            60 * 60 * 6, // for 6 hrs
+            function () use ($paper_id) {
+                return Paper::where('id', $paper_id)
+                    ->withCount('sections')
+                    ->withCount('questions')
+                    ->withSum('questions', 'marks')
+                    ->firstOrFail();
+            }
+        );
+
+        $question = cache()->remember(
+            'question_' . $question_id,
+            60 * 60 * 6, // for 6 hrs
+            function () use ($question_id) {
+                return Question::with('options')
+                    ->with('correctOption')
+                    ->with('sections')
+                    ->find($question_id);
+            }
+        );
+
         if (!session('exam.paper.id') || !session('exam.user_paper.id')) {
             return redirect()->route('exam.papers')->withErrors('SORRY !! You need to start the exam again');
         }
@@ -232,8 +279,31 @@ class ExamController extends Controller
         return redirect()->route('exam.paper', [$paper, 'question_id' => $nexQuestionId]);
     }
 
-    public function questionMark(Request $request, Paper $paper, Question $question)
+    public function questionMark(Request $request, $paper_id, $question_id)
     {
+        $paper = cache()->remember(
+            'paper_' . $paper_id,
+            60 * 60 * 6, // for 6 hrs
+            function () use ($paper_id) {
+                return Paper::where('id', $paper_id)
+                    ->withCount('sections')
+                    ->withCount('questions')
+                    ->withSum('questions', 'marks')
+                    ->firstOrFail();
+            }
+        );
+
+        $question = cache()->remember(
+            'question_' . $question_id,
+            60 * 60 * 6, // for 6 hrs
+            function () use ($question_id) {
+                return Question::with('options')
+                    ->with('correctOption')
+                    ->with('sections')
+                    ->find($question_id);
+            }
+        );
+
         UserQuestion::updateOrCreate(
             [
                 'user_id' => auth()->id(),
@@ -254,6 +324,20 @@ class ExamController extends Controller
         $nexQuestionId = $request->input('next_question_id') ? $request->input('next_question_id') : $question->id;
 
         return redirect()->route('exam.paper', [$paper, 'question_id' => $nexQuestionId]);
+    }
+
+    public function questionReset($paper_id, $question_id)
+    {
+        UserQuestion::query()
+            ->where([
+                'user_id' => auth()->id(),
+                'paper_id' => $paper_id,
+                'user_paper_id' => session('exam.user_paper.id'),
+                'question_id' => $question_id,
+            ])
+            ->delete();
+
+        return redirect()->route('exam.paper', [$paper_id, 'question_id' => $question_id]);
     }
 
     public function submit(Paper $paper)

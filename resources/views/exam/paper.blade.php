@@ -116,7 +116,8 @@
         @csrf
         <x-exam-exam:exam-sidebar :paper="$paper" :userQuestions="$userQuestions" :question="$question" />
 
-        <form action="{{ route('exam.question-save', [$paper, $question]) }}" method="POST" class="flex-fill" id="question_form">
+        <form action="{{ route('exam.question-save', [$paper, $question]) }}" method="POST" class="flex-fill"
+            id="question_form">
             @csrf
             <div id="question_area" class="flex-fill px-4 pt-4">
                 <div class="question">
@@ -146,6 +147,12 @@
                             </div>
                         @endforeach
                     </ul>
+
+                    @if ($userQuestion?->user_option_id)
+                        <div class="text-end mt-3">
+                            <a href="{{ route('exam.question-reset', [$paper, $question]) }}" class="btn btn-sm btn-danger px-3"> <i class="fas fa-times"></i> Reset</a>
+                        </div>
+                    @endif
                 </div>
             </div>
             <div id="question_action"
@@ -175,7 +182,7 @@
                         Save for review
                     </button>
                 </div>
-                <div class="d-flex flex-wrap gap-1" >
+                <div class="d-flex flex-wrap gap-1">
                     <input type="hidden" name="mark_review" id="input_mark_review" value="">
                     <input type="hidden" name="next_question_id" value="{{ $questions->get($questionKey + 1) }}">
 
@@ -314,7 +321,7 @@
                 $(this).html('Please wait');
             });
             $("button.action_btn").click(function() {
-                if($("#question_form")[0].checkValidity()){
+                if ($("#question_form")[0].checkValidity()) {
                     $(this).addClass('disabled');
                     $(this).html('Please wait');
                 }
@@ -348,11 +355,11 @@
 
                 document.getElementById("time_left_timer").innerHTML = timerText;
 
-                if(distance/1000 < 300 && distance/1000 > 299){
+                if (distance / 1000 < 300 && distance / 1000 > 299) {
                     alert('Time is ticking. You have only 5 mins left to complete the exam.');
                 }
 
-                if(distance/1000 < 120 && distance/1000 > 119){
+                if (distance / 1000 < 120 && distance / 1000 > 119) {
                     alert('Time is ticking. You have only 2 mins left to complete the exam.');
                 }
 

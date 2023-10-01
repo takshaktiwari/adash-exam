@@ -3,7 +3,7 @@
         <label class="form-check-label list-group-item mb-0 " style="padding-left: 2rem;">
             <input
                 hx-get="{{ route('admin.exam.htmx.questions.attach.toggle', ['question_id' => $question->id, $url_param_name => $url_param_value]) }}"
-                hx-trigger="change" hx-swap="none" class="form-check-input" type="checkbox" name="questions[]"
+                hx-trigger="change" hx-swap="none" hx-on="htmx:afterSettle: document.getElementById('questions_count').innerHTML = event.detail.xhr.response" class="form-check-input" type="checkbox" name="questions[]"
                 value="{{ $question->id }}"
                 {{ $model->questions?->pluck('id')->contains($question->id) ? 'checked' : '' }}>
             <p class="mb-0">{{ strip_tags($question->question) }}</p>

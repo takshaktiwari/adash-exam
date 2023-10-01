@@ -23,7 +23,12 @@
         <div class="card-body">
             <p><b>Paper:</b> {{ $paper->title }}</p>
             <p class="mb-10"><b>Section:</b> {{ $section->name }}</p>
-            <p class="mb-10"><b>Questions:</b> {{ $section->questions_count }}</p>
+            <p class="mb-10">
+                <b>Questions:</b>
+                <span id="questions_count">
+                    {{ $section->questions_count }}
+                </span>
+            </p>
         </div>
     </div>
 
@@ -60,4 +65,5 @@
             hx-trigger="load" id="questions">
         </div>
     </form>
+
 </x-admin.layout>

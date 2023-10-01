@@ -280,7 +280,6 @@ class QuestionController extends Controller
                 $model->questions()->attach([$request->get('question_id') => ['paper_id' => $model->paper_id]]);
             }
 
-            return true;
         } else {
             $model = Paper::find($request->get('paper_id'));
             if ($model->questions->pluck('id')->contains($request->get('question_id'))) {
@@ -290,7 +289,8 @@ class QuestionController extends Controller
             }
         }
 
-        return true;
+        $model->loadCount('questions');
+        return $model->questions_count;
     }
 
     public function bulkDelete(Request $request)

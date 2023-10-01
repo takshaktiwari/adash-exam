@@ -49,6 +49,7 @@ Route::middleware('web')->group(function () {
         Route::get('{paper}/start', [ExamController::class, 'start'])->name('start');
         Route::get('{paper}/paper', [ExamController::class, 'paper'])->name('paper');
         Route::post('{paper}/save/{question}', [ExamController::class, 'questionSave'])->name('question-save');
+        Route::get('{paper}/reset/{question}', [ExamController::class, 'questionReset'])->name('question-reset');
         Route::get('{paper}/mark/{question}', [ExamController::class, 'questionMark'])->name('question-mark');
         Route::get('{paper}/submit', [ExamController::class, 'submit'])->name('submit');
 

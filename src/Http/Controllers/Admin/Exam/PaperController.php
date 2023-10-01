@@ -109,11 +109,14 @@ class PaperController extends Controller
             'attempts_limit'     =>  $request->post('attempts_limit'),
         ]);
 
+        cache()->forget('paper_' . $paper->id);
+
         return redirect()->route('admin.exam.papers.show', [$paper])->withErrors('Updated !! Paper has been successfully created. ');
     }
 
     public function destroy(Paper $paper)
     {
+        cache()->forget('paper_' . $paper->id);
         $paper->delete();
         return redirect()->route('admin.exam.papers.index')->withErrors('DELETED !! Paper is successfully deleted');
     }
@@ -133,8 +136,8 @@ class PaperController extends Controller
         $request->validate([
             'questions' =>  'required|array'
         ]);
-
         $paper->questions()->sync($request->questions);
+        cache()->forget('paper_' . $paper->id);
         return back();
     }
 }

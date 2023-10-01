@@ -22,11 +22,16 @@ class ExamServiceProvider extends ServiceProvider
             View\Components\Exam\UserQuestionCard::class,
         ]);
 
+        if(file_exists(base_path('routes/exam.php'))) {
+            $this->loadRoutesFrom(base_path('routes/exam.php'));
+        } else {
+            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        }
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
 
 
         $this->publishes([
+            __DIR__ . '/../routes/web.php' => base_path('routes/exam.php'),
             __DIR__ . '/../database/seeders' => database_path('seeders'),
             __DIR__ . '/../resources/views' => resource_path('views'),
             __DIR__ . '/../storage/questions_import_sample.xlsx' => storage_path('app/downloadable/questions_import_sample.xlsx'),
@@ -35,6 +40,14 @@ class ExamServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../database/seeders' => database_path('seeders'),
         ], 'adash-exam-seeds');
+
+        $this->publishes([
+            __DIR__ . '/../routes/web.php' => base_path('routes/exam.php'),
+        ], 'adash-exam-routes');
+
+        $this->publishes([
+            __DIR__ . '/../resources/views' => resource_path('views'),
+        ], 'adash-exam-views');
 
         Paginator::useBootstrap();
     }
