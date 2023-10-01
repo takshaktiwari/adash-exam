@@ -3,24 +3,44 @@
 namespace Takshak\Exam\Http\Controllers\Admin\Exam;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
+use Takshak\Exam\Models\Paper;
 use Takshak\Exam\Models\UserPaper;
 
 class UserPaperController extends Controller
 {
     public function index(Request $request)
     {
+        $papers = collect();
+        $users = collect();
+        if (request('filter')) {
+            $papers = Paper::select('id', 'title')->get();
+            $users = User::select('id', 'name')->get();
+        }
+
         $userPapers = UserPaper::query()
-            ->with(['paper' => function($query){
+            ->with(['paper' => function ($query) {
                 $query->withCount('questions');
             }])
             ->with('questions:id,user_paper_id,status,marks')
+            ->when($request->get('paper_id'), function ($query) use ($request) {
+                $query->where('paper_id', $request->get('paper_id'));
+            })
+            ->when($request->get('user_id'), function ($query) use ($request) {
+                $query->where('user_id', $request->get('user_id'));
+            })
+            ->when($request->get('started_on'), function ($query) use ($request) {
+                $query->whereDate('start_at', $request->get('started_on'));
+            })
             ->latest()
             ->paginate(50);
 
         return View::first(['admin.exam.user-papers.index', 'exam::admin.exam.user-papers.index'])->with([
             'userPapers' =>  $userPapers,
+            'papers' =>  $papers,
+            'users' =>  $users,
         ]);
     }
 

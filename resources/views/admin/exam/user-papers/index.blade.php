@@ -12,6 +12,51 @@
         ],
     ]" />
 
+    <form action="" class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="">Paper</label>
+                        <select name="paper_id" id="paper_id" class="form-control">
+                            <option value="">-- Select --</option>
+                            @foreach ($papers as $paper)
+                                <option value="{{ $paper->id }}" {{ (request('paper_id') == $paper->id) ? 'selected' : '' }}>
+                                    {{ $paper->title }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="">User</label>
+                        <select name="user_id" id="user_id" class="form-control">
+                            <option value="">-- Select --</option>
+                            @foreach ($users as $user)
+                                <option value="{{ $user->id }}" {{ (request('user_id') == $user->id) ? 'selected' : '' }}>
+                                    {{ $user->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="">Started On</label>
+                        <input type="date" name="started_on" class="form-control" value="{{ request('started_on') }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <input type="hidden" name="filter" value="1">
+            <button type="submit" class="btn btn-dark px-4">
+                <i class="fas fa-save"></i> Submit
+            </button>
+        </div>
+    </form>
+
     <div class="card shadow-sm">
         <div class="card-body table-responsive">
             <table class="table">
