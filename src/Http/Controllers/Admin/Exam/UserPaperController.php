@@ -71,4 +71,18 @@ class UserPaperController extends Controller
         $userPaper->delete();
         return redirect()->route('admin.exam.user-papers.index')->withSuccess('SUCCESS !! User exam has been deleted.');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'user_paper_ids' => 'required'
+        ]);
+
+        $user_paper_ids = explode(',', $request->user_paper_ids);
+        if (count($user_paper_ids)) {
+            UserPaper::whereIn('id', $user_paper_ids)->delete();
+        }
+
+        return redirect()->route('admin.exam.user-papers.index')->withSuccess('SUCCESS !! Selected questions are successfully deleted');
+    }
 }

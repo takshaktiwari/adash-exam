@@ -32,6 +32,7 @@ Route::middleware('web')->group(function () {
 
             Route::prefix('user-papers')->name('user-papers.')->group(function () {
                 Route::get('/', [ExamUserPaperController::class, 'index'])->name('index');
+                Route::get('bulk-delete', [ExamUserPaperController::class, 'bulkDelete'])->name('bulk-delete');
                 Route::get('{userPaper}', [ExamUserPaperController::class, 'show'])->name('show');
                 Route::get('delete/{userPaper}', [ExamUserPaperController::class, 'destroy'])->name('delete');
             });
