@@ -30,8 +30,8 @@ To customize views publish views and you will get exam layout in layouts folder,
 
 Additionally you can publish just required assets. 
 
-- Publish Seeders: `php artisan vendor:publish --tag="adash-exam-seeds". You will get the seeders in seeders folder.
+- **Publish Seeders:** `php artisan vendor:publish --tag="adash-exam-seeds"`. You will get the seeders in seeders folder.
 
-- Publish Routes: `php artisan vendor:publish --tag="adash-exam-routes". You will get a file named *exam.php* in routes folder.
+- **Publish Routes:** `php artisan vendor:publish --tag="adash-exam-routes"`. You will get a file named *exam.php* in routes folder.
 
-- Publish Views: `php artisan vendor:publish --tag="adash-exam-views". You will get the views in *exam* folder in components and in admin folder.
+- **Publish Views:** `php artisan vendor:publish --tag="adash-exam-views"`. You will get the views in *exam* folder in components and in admin folder.
