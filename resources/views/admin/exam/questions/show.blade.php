@@ -43,20 +43,23 @@
                 @endforeach
             </ul>
         </div>
-        <div class="card-body border-top bg-light">
-            <h5>
-                Children Question: ({{ $question->children->count() }})
-                <a href="{{ route('admin.exam.questions.bind', [$question]) }}" class="badge bg-primary">Add Question</a>
-            </h5>
-            <ul class="mb-0">
-                @foreach ($question->children as $childQuestion)
-                    <li>
-                        <a href="{{ route('admin.exam.questions.show', [$childQuestion]) }}" class="fs-12">
-                            {{ strip_tags($childQuestion?->question) }}
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
-        </div>
+        @if (!$question->question_id)
+            <div class="card-body border-top bg-light">
+                <h5>
+                    Children Question: ({{ $question->children->count() }})
+                    <a href="{{ route('admin.exam.questions.bind', [$question]) }}" class="badge bg-primary">Add
+                        Question</a>
+                </h5>
+                <ul class="mb-0">
+                    @foreach ($question->children as $childQuestion)
+                        <li>
+                            <a href="{{ route('admin.exam.questions.show', [$childQuestion]) }}" class="fs-12">
+                                {{ strip_tags($childQuestion?->question) }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </div>
 </x-admin.layout>

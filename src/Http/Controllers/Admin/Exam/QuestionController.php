@@ -274,6 +274,7 @@ class QuestionController extends Controller
             ->when($questionIds, function ($query) use ($questionIds) {
                 $query->orderByRaw("FIELD(questions.id, " . $questionIds . ") DESC");
             })
+            ->latest()
             ->paginate(200)
             ->withQueryString();
 
@@ -352,6 +353,7 @@ class QuestionController extends Controller
             ->when($questionIds, function ($query) use ($questionIds) {
                 $query->orderByRaw("FIELD(questions.id, " . $questionIds . ") DESC");
             })
+            ->latest()
             ->paginate(200)
             ->withQueryString();
 

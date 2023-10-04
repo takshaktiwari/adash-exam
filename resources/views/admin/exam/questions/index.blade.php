@@ -111,7 +111,7 @@
                                     @if (!$question->question_id)
                                         <div>
                                             <a href="{{ route('admin.exam.questions.bind', [$question]) }}"
-                                                class="load-circle badge {{ $question->children_count ? 'bg-primary' : 'bg-dark' }}">
+                                                class="no-loader badge {{ $question->children_count ? 'bg-primary' : 'bg-dark' }}">
                                                 @if ($question->children_count)
                                                     <span class="fs-14">
                                                         {{ $question->children_count }}
@@ -130,7 +130,7 @@
                                         </span>
                                     @else
                                         <a href="{{ route('admin.exam.questions.index', ['question_id' => $question->id]) }}"
-                                            class="lc-2">
+                                            class="lc-2 no-loader">
                                             {{ strip_tags($question->question) }}
                                         </a>
                                     @endif
