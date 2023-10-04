@@ -1,4 +1,3 @@
-
 <div id="sidebar" class="bg-dark ">
     <div class="user pt-4 pb-2">
         <div class="text-center">
@@ -78,19 +77,30 @@
         @if ($paper->sections_count)
             @foreach ($paper->sections as $section)
                 <div class="section mb-2 px-3 border-bottom border-secondary">
-                    <a href="" class="list-group-item py-2 d-flex justify-content-between" data-bs-toggle="collapse"
-                        data-bs-target="#section_{{ $section->id }}">
+                    <a href="" class="list-group-item py-2 d-flex justify-content-between"
+                        data-bs-toggle="collapse" data-bs-target="#section_{{ $section->id }}">
                         <span>{{ $section->name }}</span>
                         <span><i class="fa-solid fa-arrow-right"></i></span>
                     </a>
 
-                    <div class="pb-2 {{ !$question->sections->pluck('id')->contains($section->id) ? 'collapse' : '' }}" id="section_{{ $section->id }}">
+                    <div class="pb-2 {{ !$question->sections->pluck('id')->contains($section->id) ? 'collapse' : '' }}"
+                        id="section_{{ $section->id }}">
                         <div class="d-flex flex-wrap gap-2">
+                            @php
+                                $sl = 1;
+                            @endphp
                             @foreach ($section->questions as $sQuestion)
                                 <a href="{{ route('exam.paper', [$paper, 'question_id' => $sQuestion->id]) }}"
                                     class="question_item btn btn-sm btn-light bg-{{ $getQuestionClass($sQuestion) }} border">
-                                    {{ $loop->iteration }}
+                                    {{ $sl++ }}
                                 </a>
+
+                                @foreach ($question->children as $childQuestion)
+                                    <a href="{{ route('exam.paper', [$paper, 'question_id' => $childQuestion->id]) }}"
+                                        class="question_item btn btn-sm btn-light bg-{{ $getQuestionClass($childQuestion) }} border">
+                                        {{ $sl++ }}
+                                    </a>
+                                @endforeach
                             @endforeach
                         </div>
                     </div>
@@ -98,11 +108,20 @@
             @endforeach
         @else
             <div class="d-flex flex-wrap gap-2 px-3">
+                @php
+                    $sl = 1;
+                @endphp
                 @foreach ($paper->questions as $question)
                     <a href="{{ route('exam.paper', [$paper, 'question_id' => $question->id]) }}"
                         class="question_item btn btn-sm btn-light bg-{{ $getQuestionClass($question) }} border">
-                        {{ $loop->iteration }}
+                        {{ $sl++ }}
                     </a>
+                    @foreach ($question->children as $childQuestion)
+                        <a href="{{ route('exam.paper', [$paper, 'question_id' => $childQuestion->id]) }}"
+                            class="question_item btn btn-sm btn-light bg-{{ $getQuestionClass($childQuestion) }} border">
+                            {{ $sl++ }}
+                        </a>
+                    @endforeach
                 @endforeach
             </div>
             <hr />

@@ -49,9 +49,20 @@
 
 
     <form method="POST" action="{{ route('admin.exam.questions.store') }}" class="card shadow-sm"
-        enctype="multipart/form-data">
+        enctype="multipart/form-data" id="question_form">
         @csrf
         <div class="card-body">
+            <div class="form-group">
+                <label for="">Parent Question</label>
+                <select name="question_id" id="question_id" class="form-control select2">
+                    <option value="">-- Select --</option>
+                    @foreach ($questions as $question)
+                        <option value="{{ $question->id }}">
+                            {{ strip_tags($question->question) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -118,7 +129,7 @@
 
         </div>
         <div class="card-footer">
-            <input type="submit" class="btn btn-dark px-4">
+            <input type="submit" class="btn btn-dark px-4" id="question_submit_btn">
         </div>
     </form>
 
@@ -139,6 +150,14 @@
         </script>
         <script>
             $(document).ready(function() {
+                $("#question_submit_btn").click(function(){
+                    var correctAnsVal = $('input[name="correct_ans"]:checked').val();
+                    if(!correctAnsVal){
+                        alert('Please check the correct answer');
+                        return false;
+                    }
+                });
+
                 $("#add_option_btn").click(function() {
                     var optionsCount = $("#question_options .option").length;
                     var newOptionCount = ++optionsCount;

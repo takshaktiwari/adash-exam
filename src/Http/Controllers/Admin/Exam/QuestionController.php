@@ -9,6 +9,7 @@ use Takshak\Exam\Models\Question;
 use Illuminate\Support\Facades\View;
 use Takshak\Exam\Models\QuestionOption;
 use Maatwebsite\Excel\Facades\Excel;
+use Takshak\Exam\Exports\QuestionsExport;
 use Takshak\Exam\Imports\QuestionsImport;
 use Takshak\Exam\Models\Paper;
 use Takshak\Exam\Models\PaperSection;
@@ -20,7 +21,12 @@ class QuestionController extends Controller
     public function index(Request $request)
     {
         $questions = Question::query()
+            ->withCount('children')
             ->with('questionGroups:id,name')
+            ->with('papers:id,title')
+            ->when($request->get('question_id'), function ($query) use ($request) {
+                $query->where('question_id', $request->get('question_id'));
+            })
             ->when($request->get('question'), function ($query) {
                 $query->where('question', 'like', "%" . request('question') . "%");
             })
@@ -46,15 +52,18 @@ class QuestionController extends Controller
 
     public function create()
     {
+        $questions = Question::select('id', 'question')->get();
         $questionGroups = QuestionGroup::get();
         return View::first(['admin.exam.questions.create', 'exam::admin.exam.questions.create'])->with([
-            'questionGroups'    =>  $questionGroups
+            'questionGroups'    =>  $questionGroups,
+            'questions'    =>  $questions
         ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
+            'question_id'        =>    'nullable|numeric',
             'question'        =>    'required|unique:questions',
             'ques_option'    =>    'required|array',
             'correct_ans'    =>    'required|numeric',
@@ -65,6 +74,7 @@ class QuestionController extends Controller
         ]);
 
         $ques = new Question();
+        $ques->question_id = $request->post('question_id');
         $ques->question = $request->post('question');
         $ques->answer   = $request->post('answer');
         $ques->marks    = $request->post('marks');
@@ -98,6 +108,7 @@ class QuestionController extends Controller
 
     public function show(Question $question)
     {
+        $question->load('parent');
         return View::first(['admin.exam.questions.show', 'exam::admin.exam.questions.show'])
             ->with([
                 'question'   =>  $question
@@ -108,9 +119,11 @@ class QuestionController extends Controller
     {
         cache()->forget('question_' . $id);
         $question = Question::find($id);
+        $questions = Question::select('id', 'question')->get();
         $questionGroups = QuestionGroup::get();
         return View::first(['admin.exam.questions.edit', 'exam::admin.exam.questions.edit'])->with([
             'question' =>  $question,
+            'questions' =>  $questions,
             'questionGroups' =>  $questionGroups
         ]);
     }
@@ -118,6 +131,7 @@ class QuestionController extends Controller
     public function update(Request $request, Question $question)
     {
         $request->validate([
+            'question_id' => 'nullable|numeric',
             'question'        =>    'required|unique:questions,question,' . $question->id,
             'ques_option'    =>    'required|array',
             'correct_ans'    =>    'required|numeric',
@@ -127,6 +141,7 @@ class QuestionController extends Controller
         ]);
 
         try {
+            $question->question_id = $request->post('question_id');
             $question->question = $request->post('question');
             $question->answer   = $request->post('answer');
             $question->marks    = $request->post('marks');
@@ -240,10 +255,16 @@ class QuestionController extends Controller
         }
 
         $questions = Question::query()
+            ->withCount('children')
             ->with('papers:id,title')
             ->with('questionGroups:id,name')
             ->when($request->get('search'), function ($query) use ($request) {
-                $query->where('question', 'LIKE', '%' . $request->search . '%');
+                $query->where(function ($query) use ($request) {
+                    $query->where('question', 'LIKE', '%' . $request->search . '%');
+                    $query->orWhereHas('parent', function ($query) use ($request) {
+                        $query->where('question', 'LIKE', '%' . $request->search . '%');
+                    });
+                });
             })
             ->when($request->get('question_group_id'), function ($query) {
                 $query->whereHas('questionGroups', function ($query) {
@@ -272,25 +293,87 @@ class QuestionController extends Controller
             'paper_id' => 'nullable|numeric'
         ]);
 
-        if ($request->get('section_id')) {
-            $model = PaperSection::find($request->get('section_id'));
-            if ($model->questions->pluck('id')->contains($request->get('question_id'))) {
-                $model->questions()->detach($request->get('question_id'));
-            } else {
-                $model->questions()->attach([$request->get('question_id') => ['paper_id' => $model->paper_id]]);
-            }
+        $question = Question::select('id')->with('children:id,question_id')->find($request->get('question_id'));
+        $questionIds = collect($question->id)->merge($question->children->pluck('id'));
 
-        } else {
-            $model = Paper::find($request->get('paper_id'));
-            if ($model->questions->pluck('id')->contains($request->get('question_id'))) {
-                $model->questions()->detach($request->get('question_id'));
+        if ($request->get('section_id')) {
+            $model = PaperSection::with('questions:id')->find($request->get('section_id'));
+
+            if ($model->questions->pluck('id')->contains($question->id)) {
+                foreach ($questionIds as $questionId) {
+                    $model->questions()->detach($questionId);
+                }
             } else {
-                $model->questions()->attach($request->get('question_id'));
+                foreach ($questionIds as $questionId) {
+                    $model->questions()->attach([$questionId => ['paper_id' => $model->paper_id]]);
+                }
+            }
+        } else {
+            $model = Paper::with('questions:id')->find($request->get('paper_id'));
+
+            if ($model->questions->pluck('id')->contains($question->id)) {
+                foreach ($questionIds as $questionId) {
+                    $model->questions()->detach($questionId);
+                }
+            } else {
+                foreach ($questionIds as $questionId) {
+                    $model->questions()->attach($questionId);
+                }
             }
         }
 
         $model->loadCount('questions');
         return $model->questions_count;
+    }
+
+    public function htmxBindList(Request $request)
+    {
+        $parentQuestion = Question::with('children')->find($request->get('question_id'));
+        $questionIds = Question::where('question_id', $request->get('question_id'))->pluck('id');
+        $childrenQuestionIds = $questionIds;
+
+        if ($questionIds && $questionIds->count()) {
+            $questionIds = $questionIds->map(fn ($item) => "'" . $item . "'")->implode(',');
+        } else {
+            $questionIds = null;
+        }
+
+        $questions = Question::query()
+            ->with('papers:id,title')
+            ->with('questionGroups:id,name')
+            ->when($request->get('search'), function ($query) use ($request) {
+                $query->where('question', 'LIKE', '%' . $request->search . '%');
+            })
+            ->when($request->get('question_group_id'), function ($query) {
+                $query->whereHas('questionGroups', function ($query) {
+                    $query->where('question_groups.id', request('question_group_id'));
+                });
+            })
+            ->when($questionIds, function ($query) use ($questionIds) {
+                $query->orderByRaw("FIELD(questions.id, " . $questionIds . ") DESC");
+            })
+            ->paginate(200)
+            ->withQueryString();
+
+        return View::first(['admin.exam.htmx.questions-bind-list', 'exam::admin.exam.htmx.questions-bind-list'])->with([
+            'questions' =>  $questions,
+            'childrenQuestionIds' =>  $childrenQuestionIds,
+            'parentQuestion' => $parentQuestion
+        ]);
+    }
+
+    public function htmxBindToggle(Request $request)
+    {
+        $request->validate([
+            'question_id' => 'required|numeric',
+            'parent_question_id' => 'required|numeric',
+        ]);
+
+        Question::where('id', $request->get('question_id'))->update([
+            'question_id' => $request->parent_question_id
+        ]);
+
+        return true;
     }
 
     public function bulkDelete(Request $request)
@@ -305,5 +388,20 @@ class QuestionController extends Controller
         }
 
         return redirect()->route('admin.exam.questions.index')->withSuccess('SUCCESS !! Selected questions are successfully deleted');
+    }
+
+    public function export()
+    {
+        return (new QuestionsExport())->download('questions.xlsx');
+    }
+
+    public function bind(Question $question)
+    {
+        $question->load('children');
+        $questionGroups = QuestionGroup::select('id', 'name')->get();
+        return View::first(['admin.exam.questions.bind', 'exam::admin.exam.questions.bind'])->with([
+            'question' =>  $question,
+            'questionGroups' =>  $questionGroups,
+        ]);
     }
 }

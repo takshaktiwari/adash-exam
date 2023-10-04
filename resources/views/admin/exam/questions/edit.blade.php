@@ -59,6 +59,17 @@
         @csrf
         @method('PUT')
         <div class="card-body">
+            <div class="form-group">
+                <label for="">Parent Question</label>
+                <select name="question_id" id="question_id" class="form-control select2">
+                    <option value="">-- Select --</option>
+                    @foreach ($questions as $question)
+                        <option value="{{ $question->id }}">
+                            {{ strip_tags($question->question) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">

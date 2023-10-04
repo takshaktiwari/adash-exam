@@ -68,7 +68,8 @@ class PaperController extends Controller
         $paper->loadSum('questions', 'marks')
             ->load(['sections' => function ($query) {
                 $query->withCount('questions');
-            }]);
+            }])
+            ->loadCount('questions');
 
         return View::first(['admin.exam.papers.show', 'exam::admin.exam.papers.show'])
             ->with([

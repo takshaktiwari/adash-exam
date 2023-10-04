@@ -40,6 +40,10 @@
                                 <td>{{ $paper->total_time }}</td>
                             </tr>
                             <tr>
+                                <th>Total Questions</th>
+                                <td>{{ $paper->questions_count }}</td>
+                            </tr>
+                            <tr>
                                 <th>Activate At</th>
                                 <td>{{ $paper->activate_at->format('d-M-Y h:i A') }}</td>
                             </tr>

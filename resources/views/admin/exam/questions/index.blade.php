@@ -7,6 +7,12 @@
             'class' => 'btn-light btn-loader',
         ],
         [
+            'text' => 'Export',
+            'icon' => 'fas fa-file-excel',
+            'url' => route('admin.exam.questions.export', request()->all()),
+            'class' => 'btn-success btn-loader',
+        ],
+        [
             'text' => 'Add Question',
             'icon' => 'fas fa-plus',
             'url' => route('admin.exam.questions.create'),
@@ -94,18 +100,56 @@
                             <td>
                                 <div class="form-check">
                                     <label class="form-check-label">
-                                        <input class="form-check-input question_ids" type="checkbox" value="{{ $question->id }}">
+                                        <input class="form-check-input question_ids" type="checkbox"
+                                            value="{{ $question->id }}">
                                         {{ $key + 1 }}
                                     </label>
                                 </div>
                             </td>
                             <td>
-                                {{ $question->question }}
+                                <div class="d-flex gap-2">
+                                    @if (!$question->question_id)
+                                        <div>
+                                            <a href="{{ route('admin.exam.questions.bind', [$question]) }}"
+                                                class="load-circle badge {{ $question->children_count ? 'bg-primary' : 'bg-dark' }}">
+                                                @if ($question->children_count)
+                                                    <span class="fs-14">
+                                                        {{ $question->children_count }}
+                                                    </span>
+                                                @else
+                                                    <i class="fas fa-th-list"></i>
+                                                @endif
+                                            </a>
+                                        </div>
+                                    @endif
+
+                                    @if ($question->question_id)
+                                        <span>
+                                            <b>{{ $question->question_id ? '--' : '' }}</b>
+                                            {{ strip_tags($question->question) }}
+                                        </span>
+                                    @else
+                                        <a href="{{ route('admin.exam.questions.index', ['question_id' => $question->id]) }}"
+                                            class="lc-2">
+                                            {{ strip_tags($question->question) }}
+                                        </a>
+                                    @endif
+                                </div>
+                                @if ($question->papers->count())
+                                    <div class="small">
+                                        <b>Papers:</b>
+                                        @foreach ($question->papers as $paper)
+                                            <a href="{{ route('admin.exam.papers.show', [$paper]) }}" class="mr-2">
+                                                ({{ $paper->title }})
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </td>
                             <td>
                                 @foreach ($question->questionGroups as $group)
                                     <a href="{{ route('admin.exam.questions.index', ['question_group_id' => $group->id]) }}"
-                                        class="badge bg-info fs-12">
+                                        class="badge bg-info fs-11">
                                         {{ $group->name }}
                                     </a>
                                 @endforeach
@@ -115,11 +159,11 @@
                             </td>
                             <td class="text-nowrap">
                                 <a href="{{ route('admin.exam.questions.show', [$question]) }}"
-                                    class="btn btn-sm btn-info">
+                                    class="btn btn-sm btn-info load-circle">
                                     <i class="fas fa-info-circle"></i>
                                 </a>
                                 <a href="{{ route('admin.exam.questions.edit', [$question]) }}"
-                                    class="btn btn-sm btn-success" title="Edit Date Slot">
+                                    class="btn btn-sm btn-success load-circle" title="Edit Date Slot">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('admin.exam.questions.destroy', [$question]) }}"
@@ -159,12 +203,13 @@
                         return $(this).val();
                     }).get();
 
-                    if(!questionIds.length){
+                    if (!questionIds.length) {
                         alert('Please select questions.');
                         return false;
                     }
 
-                    window.location.href = "{{ route('admin.exam.questions.bulk-delete') }}?question_ids="+encodeURIComponent(questionIds);
+                    window.location.href = "{{ route('admin.exam.questions.bulk-delete') }}?question_ids=" +
+                        encodeURIComponent(questionIds);
                 });
             });
         </script>

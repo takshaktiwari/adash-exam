@@ -37,9 +37,17 @@ class QuestionsImport implements ToModel, WithBatchInserts, WithHeadingRow, With
             return null;
         }
 
-        $question = Question::where('question', $this->row['question'])->first();
+        if(!empty($this->row['id']))
+        {
+            $question = Question::where('id', $this->row['id'])->first();
+        }
+
+        if(!$question){
+            $question = Question::where('question', $this->row['question'])->first();
+        }
 
         $object = [
+            'question_id'    =>    $this->row['parent_id'],
             'question'    =>    $this->row['question'],
             'answer'    =>    $this->row['answer'],
             'marks'     =>  $this->row['marks'],
@@ -69,6 +77,9 @@ class QuestionsImport implements ToModel, WithBatchInserts, WithHeadingRow, With
         }
         if ($this->row['option_4']) {
             $this->update_option($question, 'option_4', $this->row['option_4']);
+        }
+        if ($this->row['option_5']) {
+            $this->update_option($question, 'option_5', $this->row['option_5']);
         }
 
         return null;

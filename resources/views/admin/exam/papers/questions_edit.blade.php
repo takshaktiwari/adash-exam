@@ -17,40 +17,49 @@
 
     <div class="card shadow-sm">
         <div class="card-header border-bottom border-dark">
-            <h5 class="">{{ $paper->title }}</h5>
+            <h5 class="">
+                <a href="{{ route('admin.exam.papers.show', [$paper]) }}">
+                    {{ $paper->title }}
+                </a>
+            </h5>
             <p class="mb-0">
                 <b>Questions: </b>
                 <span id="questions_count">{{ $paper->questions_count }}</span>
             </p>
         </div>
-        <div class="card-header d-flex">
-            <div style="width: 350px">
-                <label for="">Question Group</label>
-                <select name="question_group_id" id="question_group_id" class="form-control"
-                    hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
-                    hx-include="#question_search" hx-trigger="change" hx-target="#questions">
-                    <option value="">-- Question group --</option>
-                    @foreach ($questionGroups as $group)
-                        <option value="{{ $group->id }}">
-                            {{ $group->name }}
-                        </option>
-                    @endforeach
-                </select>
+        <div class="card-header">
+            <div class="d-flex">
+                <div style="width: 350px">
+                    <label for="">Question Group</label>
+                    <select name="question_group_id" id="question_group_id" class="form-control"
+                        hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
+                        hx-include="#question_search" hx-trigger="change" hx-target="#questions">
+                        <option value="">-- Question group --</option>
+                        @foreach ($questionGroups as $group)
+                            <option value="{{ $group->id }}">
+                                {{ $group->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex-fill">
+                    <label for="">Search</label>
+                    <input type="text" name="search" id="question_search" class="form-control"
+                        placeholder="Search question"
+                        hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
+                        hx-include="#question_group_id" hx-trigger="change, load" hx-target="#questions">
+
+                </div>
             </div>
-            <div class="flex-fill">
-                <label for="">Search</label>
-                <input type="text" name="search" id="question_search" class="form-control"
-                    placeholder="Search question"
-                    hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
-                    hx-include="#question_group_id" hx-trigger="change" hx-target="#questions">
+            <div class="text-end">
+                <a href="{{ url()->current() }}" class="text-danger"><i class="fas fa-times"></i> Reset</a>
             </div>
         </div>
     </div>
 
     <form method="POST" action="{{ route('admin.exam.papers.questions.update', [$paper]) }}" class="card shadow-sm">
         @csrf
-        <div class="card-body" hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
-            hx-trigger="load" id="questions">
+        <div class="card-body" id="questions">
         </div>
     </form>
 

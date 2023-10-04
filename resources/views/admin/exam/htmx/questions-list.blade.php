@@ -1,12 +1,24 @@
 @foreach ($questions as $question)
-    <div class="form-check mb-0 ps-0">
-        <label class="form-check-label list-group-item mb-0 " style="padding-left: 2rem;">
+    <div class="form-check mb-0 ps-0 list-group-item">
+        <label class="form-check-label mb-0" style="padding-left: 2rem;">
             <input
                 hx-get="{{ route('admin.exam.htmx.questions.attach.toggle', ['question_id' => $question->id, $url_param_name => $url_param_value]) }}"
-                hx-trigger="change" hx-swap="none" hx-on="htmx:afterSettle: document.getElementById('questions_count').innerHTML = event.detail.xhr.response" class="form-check-input" type="checkbox" name="questions[]"
-                value="{{ $question->id }}"
+                hx-trigger="change" hx-swap="none"
+                hx-on="htmx:afterSettle: document.getElementById('questions_count').innerHTML = event.detail.xhr.response"
+                class="form-check-input" type="checkbox" name="questions[]" value="{{ $question->id }}"
                 {{ $model->questions?->pluck('id')->contains($question->id) ? 'checked' : '' }}>
-            <p class="mb-0">{{ strip_tags($question->question) }}</p>
+            <p class="mb-0 lh-base">
+                @if ($question->children_count)
+                    <span class="load-circle fs-12 badge bg-dark">
+                        {{ $question->children_count }}
+                    </span>
+                @endif
+
+                {{ $question->question_id ? '--' : '' }}
+                {{ strip_tags($question->question) }}
+            </p>
+        </label>
+        <div class="ms-4">
             @foreach ($question->questionGroups as $group)
                 <a href="{{ route('admin.exam.questions.index', ['question_group_id' => $group->id]) }}"
                     class="badge bg-info">
@@ -22,7 +34,7 @@
                     @endforeach
                 </div>
             @endif
-        </label>
+        </div>
     </div>
 @endforeach
 @if ($questions->hasMorePages())

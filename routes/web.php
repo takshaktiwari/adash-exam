@@ -19,6 +19,8 @@ Route::middleware('web')->group(function () {
             Route::post('questions/upload', [QuestionController::class, 'uploadDo'])->name('questions.upload.do');
             Route::get('questions/sample-download', [QuestionController::class, 'sampleDownload'])->name('questions.sample-download');
             Route::get('questions/bulk-delete', [QuestionController::class, 'bulkDelete'])->name('questions.bulk-delete');
+            Route::get('questions/export', [QuestionController::class, 'export'])->name('questions.export');
+            Route::get('questions/bind/{question}', [QuestionController::class, 'bind'])->name('questions.bind');
             Route::resource('questions', QuestionController::class);
 
             Route::resource('question-groups', QuestionGroupController::class);
@@ -38,8 +40,10 @@ Route::middleware('web')->group(function () {
             });
 
             Route::prefix('htmx')->name('htmx.')->group(function () {
+                Route::get('questions/bind/list', [QuestionController::class, 'htmxBindList'])->name('questions.bind.list');
                 Route::get('questions/list', [QuestionController::class, 'htmxList'])->name('questions.list');
                 Route::get('questions/attach/toggle', [QuestionController::class, 'htmxAttachToggle'])->name('questions.attach.toggle');
+                Route::get('questions/bind/toggle', [QuestionController::class, 'htmxBindToggle'])->name('questions.bind.toggle');
             });
         });
 

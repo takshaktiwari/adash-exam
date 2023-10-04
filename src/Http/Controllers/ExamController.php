@@ -78,7 +78,21 @@ class ExamController extends Controller
             return redirect()->route('exam.papers')->withErrors('SORRY !! Please enter exam security key / code.');
         }
 
-        $paper->load('sections.questions:id')->load('questions:id');
+        $paper->load(['sections' => function ($query) {
+            $query->select('paper_sections.id', 'paper_id');
+            $query->with(['questions' => function ($query) {
+                $query->whereNull('questions.question_id');
+                $query->select('questions.id', 'questions.question_id');
+                $query->with('children:id,question_id');
+            }]);
+        }])
+            ->load(['questions' => function ($query) {
+                $query->whereNull('questions.question_id');
+                $query->select('questions.id', 'questions.question_id');
+                $query->with('children:id,question_id');
+            }]);
+
+
         $userPaper = UserPaper::create([
             'user_id' => auth()->id(),
             'paper_id' => $paper->id,
@@ -90,17 +104,36 @@ class ExamController extends Controller
         if ($paper->sections->count()) {
             foreach ($paper->sections as $section) {
 
-                $sectionQuestionIds = $section->questions->pluck('id');
+                $sectionQuestions = $section->questions;
                 if ($paper->shuffle_questions) {
-                    $sectionQuestionIds = $sectionQuestionIds->shuffle();
+                    $sectionQuestions = $sectionQuestions->shuffle();
                 }
-                $questionIds = $questionIds->merge($sectionQuestionIds);
+
+                $sectionQuestionIds = collect();
+                foreach ($sectionQuestions as $question) {
+                    $sectionQuestionIds->push($question->id);
+                    if ($question->children->count()) {
+                        $sectionQuestionIds->push($question->children->pluck('id'));
+                    }
+                }
+
+                $questionIds = $questionIds->merge($sectionQuestionIds->flatten());
             }
         } else {
-            $questionIds = $paper->questions->pluck('id');
+            $questions = $paper->questions;
             if ($paper->shuffle_questions) {
-                $questionIds = $questionIds->shuffle();
+                $questions = $paper->questions->shuffle();
             }
+
+            $questionIds = collect();
+            foreach ($questions as $question) {
+                $questionIds->push($question->id);
+                if ($question->children->count()) {
+                    $questionIds->push($question->children->pluck('id'));
+                }
+            }
+
+            $questionIds = $questionIds->flatten();
         }
 
         $paper->unsetRelation('sections');
@@ -172,12 +205,18 @@ class ExamController extends Controller
                     ->when($paper->sections_count, function ($query) use ($questionsIdsForFilter) {
                         $query->with(['sections' => function ($query) use ($questionsIdsForFilter) {
                             $query->with(['questions' => function ($query) use ($questionsIdsForFilter) {
+                                $query->whereNull('questions.question_id');
+                                $query->select('questions.id', 'questions.question_id');
+                                $query->with('children:id,question_id');
                                 $query->orderByRaw("FIELD(questions.id, {$questionsIdsForFilter})");
                             }]);
                         }]);
                     })
                     ->when(!$paper->sections_count, function ($query) use ($questionsIdsForFilter) {
                         $query->with(['questions' => function ($query) use ($questionsIdsForFilter) {
+                            $query->whereNull('questions.question_id');
+                            $query->select('questions.id', 'questions.question_id');
+                            $query->with('children:id,question_id');
                             $query->orderByRaw("FIELD(questions.id, {$questionsIdsForFilter})");
                         }]);
                     })

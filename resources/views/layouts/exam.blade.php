@@ -22,7 +22,7 @@
     @stack('styles')
 </head>
 
-<body hx-boost="false">
+<body hx-boost="true">
     <x-alertt-alert />
 
     {{ $slot }}

@@ -52,8 +52,11 @@
                 <input type="text" name="search" id="question_search" class="form-control"
                     placeholder="Search question"
                     hx-get="{{ route('admin.exam.htmx.questions.list', ['section_id' => $section->id]) }}"
-                    hx-include="#question_group_id" hx-trigger="change" hx-target="#questions">
+                    hx-include="#question_group_id" hx-trigger="change, load" hx-target="#questions">
             </div>
+        </div>
+        <div class="text-end">
+            <a href="{{ url()->current() }}" class="text-danger"><i class="fas fa-times"></i> Reset</a>
         </div>
     </div>
 
@@ -61,8 +64,7 @@
         class="card shadow-sm">
         @csrf
         @method('PUT')
-        <div class="card-body" hx-get="{{ route('admin.exam.htmx.questions.list', ['section_id' => $section->id]) }}"
-            hx-trigger="load" id="questions">
+        <div class="card-body" id="questions">
         </div>
     </form>
 

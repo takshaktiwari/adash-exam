@@ -2,8 +2,10 @@
 
 namespace Takshak\Exam\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -71,5 +73,30 @@ class Question extends Model
     public function papers(): BelongsToMany
     {
         return $this->belongsToMany(Paper::class, 'paper_question_section');
+    }
+
+    /**
+     * Get all of the children for the Question
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(Question::class);
+    }
+
+    /**
+     * Get the parentQuestion that owns the Question
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Question::class, 'question_id', 'id');
+    }
+
+    public function scopeParent(Builder $query)
+    {
+        return $query->whereNull('question_id');
     }
 }
