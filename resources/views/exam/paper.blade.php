@@ -148,11 +148,10 @@
                         @endforeach
                     </ul>
 
-                    @if ($userQuestion?->user_option_id)
-                        <div class="text-end mt-3">
-                            <a href="{{ route('exam.question-reset', [$paper, $question]) }}" class="btn btn-sm btn-danger px-3"> <i class="fas fa-times"></i> Reset</a>
-                        </div>
-                    @endif
+                    <div class="text-end mt-3" id="reset_button" style="display: {{ $userQuestion?->user_option_id ? 'block' : 'none' }}">
+                        <a href="{{ route('exam.question-reset', [$paper, $question]) }}"
+                            class="btn btn-sm btn-danger px-3"> <i class="fas fa-times"></i> Reset</a>
+                    </div>
                 </div>
             </div>
             <div id="question_action"
@@ -311,11 +310,19 @@
             <script>
                 $(document).ready(function() {
                     $("#exam_statistics").modal('show');
-                    Fancybox.bind("[data-fancybox]", {});
                 });
             </script>
         @endif
         <script>
+            $(document).ready(function() {
+                Fancybox.bind("[data-fancybox]", {});
+
+                $("[name=user_option]").change(function() {
+                    $('#reset_button').css('display', 'block');
+                });
+            });
+
+
             $("a.action_btn").click(function() {
                 $(this).addClass('disabled');
                 $(this).html('Please wait');

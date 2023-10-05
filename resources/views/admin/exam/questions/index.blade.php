@@ -125,7 +125,9 @@
 
                                     @if ($question->question_id)
                                         <span>
-                                            <b>{{ $question->question_id ? '--' : '' }}</b>
+                                            <b data-bs-toggle="tooltip" title="{{ strip_tags($question->parent->question) }}">
+                                                <i class="fas fa-question-circle"></i>
+                                            </b>
                                             {{ strip_tags($question->question) }}
                                         </span>
                                     @else

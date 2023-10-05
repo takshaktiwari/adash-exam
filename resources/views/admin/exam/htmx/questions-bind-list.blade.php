@@ -1,12 +1,24 @@
 @foreach ($questions as $question)
+    @if ($question->children_count)
+        @continue
+    @endif
+
     <div class="form-check mb-0 ps-0">
         <label class="form-check-label list-group-item mb-0 " style="padding-left: 2rem;">
             <input
                 hx-get="{{ route('admin.exam.htmx.questions.bind.toggle', ['question_id' => $question->id, 'parent_question_id' => $parentQuestion->id]) }}"
                 hx-trigger="change" hx-swap="none" class="form-check-input" type="checkbox" name="questions[]"
-                value="{{ $question->id }}"
-                {{ $childrenQuestionIds->contains($question->id) ? 'checked' : '' }}>
-            <p class="mb-0">{{ strip_tags($question->question) }}</p>
+                value="{{ $question->id }}" {{ $childrenQuestionIds->contains($question->id) ? 'checked' : '' }}>
+
+            <span>
+                @if ($question->question_id)
+                    <span data-bs-toggle="tooltip" title="{{ strip_tags($question->parent->question) }}">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                @endif
+                {{ strip_tags($question->question) }}
+            </span>
+
             @foreach ($question->questionGroups as $group)
                 <a href="{{ route('admin.exam.questions.index', ['question_group_id' => $group->id]) }}"
                     class="badge bg-info">

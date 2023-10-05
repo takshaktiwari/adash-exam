@@ -23,6 +23,7 @@ class QuestionController extends Controller
         $questions = Question::query()
             ->withCount('children')
             ->with('questionGroups:id,name')
+            ->with('parent:id,question')
             ->with('papers:id,title')
             ->when($request->get('question_id'), function ($query) use ($request) {
                 $query->where('question_id', $request->get('question_id'));
@@ -340,7 +341,9 @@ class QuestionController extends Controller
         }
 
         $questions = Question::query()
+            ->withCount('children')
             ->with('papers:id,title')
+            ->with('parent:id,question')
             ->with('questionGroups:id,name')
             ->when($request->get('search'), function ($query) use ($request) {
                 $query->where('question', 'LIKE', '%' . $request->search . '%');
@@ -354,7 +357,7 @@ class QuestionController extends Controller
                 $query->orderByRaw("FIELD(questions.id, " . $questionIds . ") DESC");
             })
             ->latest()
-            ->paginate(200)
+            ->paginate(100)
             ->withQueryString();
 
         return View::first(['admin.exam.htmx.questions-bind-list', 'exam::admin.exam.htmx.questions-bind-list'])->with([
