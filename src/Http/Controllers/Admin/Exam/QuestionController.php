@@ -92,14 +92,28 @@ class QuestionController extends Controller
         $ques->save();
 
         foreach ($request->input('ques_option') as $key => $ques_option) {
-            if (!empty($ques_option)) {
-
-                QuestionOption::create([
-                    'question_id'    =>    $ques->id,
-                    'option_text'    =>    $ques_option,
-                    'correct_ans'    => ($key == $request->input('correct_ans')) ? true : false
-                ]);
+            if (empty($ques_option) && empty($request->file('ques_option_img')[$key])) {
+                continue;
             }
+
+            $questionOption = new QuestionOption();
+            $questionOption->question_id = $ques->id;
+            $questionOption->option_text = $ques_option;
+            $questionOption->correct_ans = ($key == $request->input('correct_ans')) ? true : false;
+
+            if (!empty($request->file('ques_option_img')[$key])) {
+                $questionOption->option_img = str()->of(microtime())->slug('-')
+                    ->prepend('options/')
+                    ->append('.')
+                    ->append($request->file('ques_option_img')[$key]->extension());
+
+                Imager::init($request->file('ques_option_img')[$key])
+                    ->resizeWidth(400)
+                    ->save(Storage::disk('public')->path($questionOption->option_img))
+                    ->destroy();
+            }
+
+            $questionOption->save();
         }
 
         $ques->questionGroups()->sync($request->question_group_id);
@@ -160,14 +174,28 @@ class QuestionController extends Controller
             QuestionOption::where('question_id', $question->id)->delete();
 
             foreach ($request->input('ques_option') as $key => $ques_option) {
-                if (!empty($ques_option)) {
-
-                    QuestionOption::create([
-                        'question_id'    =>    $question->id,
-                        'option_text'    =>    $ques_option,
-                        'correct_ans'    => ($key == $request->input('correct_ans')) ? true : false
-                    ]);
+                if (empty($ques_option) && empty($request->file('ques_option_img')[$key])) {
+                    continue;
                 }
+
+                $questionOption = new QuestionOption();
+                $questionOption->question_id = $question->id;
+                $questionOption->option_text = $ques_option;
+                $questionOption->correct_ans = ($key == $request->input('correct_ans')) ? true : false;
+
+                if (!empty($request->file('ques_option_img')[$key])) {
+                    $questionOption->option_img = str()->of(microtime())->slug('-')
+                        ->prepend('options/')
+                        ->append('.')
+                        ->append($request->file('ques_option_img')[$key]->extension());
+
+                    Imager::init($request->file('ques_option_img')[$key])
+                        ->resizeWidth(400)
+                        ->save(Storage::disk('public')->path($questionOption->option_img))
+                        ->destroy();
+                }
+
+                $questionOption->save();
             }
 
             $question->questionGroups()->sync($request->question_group_id);

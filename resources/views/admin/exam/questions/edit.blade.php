@@ -74,13 +74,14 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="">Question <span class="text-danger">*</span></label>
-                        <textarea name="question" rows="2" class="form-control text-editor" placeholder="Write your question" >{{ $question->question }}</textarea>
+                        <textarea name="question" rows="2" class="form-control text-editor" placeholder="Write your question">{{ $question->question }}</textarea>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="">Descriptive Answer </label>
-                        <textarea name="answer" rows="4" class="form-control text-editor" placeholder="Describe your answer" maxlength="499">{{ $question->answer }}</textarea>
+                        <textarea name="answer" rows="4" class="form-control text-editor" placeholder="Describe your answer"
+                            maxlength="499">{{ $question->answer }}</textarea>
                     </div>
                 </div>
             </div>
@@ -120,28 +121,42 @@
                 </label>
                 <div id="question_options">
                     @foreach ($question->options as $key => $ques_option)
-                        <div class="d-flex mb-2 option">
-                            <div class="flex-fill">
-                                <input type="text" name="ques_option[{{ $key }}]"
-                                    class="form-control rounded-0" placeholder="Option Choice {{ $key }}"
-                                    value="{{ $ques_option->option_text }}" maxlength="250" required="">
-                                <a href="javascript:void(0)" class="fw-bold text-danger small remove_option">
-                                    <i class="fas fa-times"></i> Remove
-                                </a>
-                            </div>
+                        <div class="mb-3 option">
+                            <div class="d-flex">
+                                <div class="d-flex">
+                                    @if ($ques_option->option_img)
+                                        <div>
+                                            <img src="{{ storage($ques_option->option_img) }}" alt="img"
+                                                style="height: 38px;">
+                                        </div>
+                                    @endif
+                                    <input type="file" name="ques_option_img[{{ $key }}]"
+                                        class="form-control rounded-0" accept="image/*">
+                                </div>
+                                <div class="flex-fill">
+                                    <input type="text" name="ques_option[{{ $key }}]"
+                                        class="form-control rounded-0" placeholder="Option Choice {{ $key }}"
+                                        value="{{ $ques_option->option_text }}" maxlength="250" required="">
+                                </div>
 
-                            <label class="mb-0">
-                                <input type="radio" name="correct_ans" value="{{ $key }}" required=""
-                                    {{ $ques_option->correct_ans == true ? 'checked' : '' }}>
-                                <div class="answercheck form-control rounded-0"></div>
-                            </label>
+                                <label class="mb-0">
+                                    <input type="radio" name="correct_ans" value="{{ $key }}" required=""
+                                        {{ $ques_option->correct_ans == true ? 'checked' : '' }}>
+                                    <div class="answercheck form-control rounded-0"></div>
+                                </label>
+                            </div>
+                            <a href="javascript:void(0)" class="fw-bold text-danger small remove_option d-block">
+                                <i class="fas fa-times"></i> Remove
+                            </a>
                         </div>
                     @endforeach
                 </div>
             </div>
         </div>
         <div class="card-footer">
-            <input type="submit" class="btn btn-dark px-4">
+            <button type="submit" class="btn btn-dark px-4" id="question_submit_btn">
+                <i class="fas fa-save"></i> Submit
+            </button>
         </div>
     </form>
 
@@ -162,27 +177,43 @@
         </script>
         <script>
             $(document).ready(function() {
+
+                var time = 0;
+                var notificationInterval = setInterval(() => {
+                    $("body").find('.tox .tox-notifications-container').css('display', 'none');
+                    time++;
+                    if (time > 5) {
+                        clearInterval(notificationInterval);
+                    }
+                }, 1000);
+
                 $("#add_option_btn").click(function() {
                     var optionsCount = $("#question_options .option").length;
                     var newOptionCount = ++optionsCount;
-                    console.log(newOptionCount);
-                    $("#question_options").append(`
-                        <div class="d-flex mb-2 option">
-                            <div class="flex-fill">
-                                <input type="text" name="ques_option[${newOptionCount}]"
-                                    class="form-control rounded-0"
-                                    placeholder="Option Choice ${newOptionCount}"
-                                    value="" maxlength="250" required="">
-                                <a href="javascript:void(0)" class="fw-bold text-danger small remove_option">
-                                    <i class="fas fa-times"></i> Remove
-                                </a>
-                            </div>
 
-                            <label class="mb-0">
-                                <input type="radio" name="correct_ans" value="${newOptionCount}"
-                                    required="">
-                                <div class="answercheck form-control rounded-0"></div>
-                            </label>
+                    $("#question_options").append(`
+                    <div class="mb-3 option">
+                            <div class="d-flex">
+                                <div>
+                                    <input type="file" name="ques_option_img[${newOptionCount}]"
+                                        class="form-control rounded-0">
+                                </div>
+                                <div class="flex-fill">
+                                    <input type="text" name="ques_option[${newOptionCount}]"
+                                        class="form-control rounded-0"
+                                        placeholder="Option Choice ${newOptionCount}"
+                                        value="" maxlength="250" required="">
+                                </div>
+
+                                <label class="mb-0">
+                                    <input type="radio" name="correct_ans" value="${newOptionCount}"
+                                        required="">
+                                    <div class="answercheck form-control rounded-0"></div>
+                                </label>
+                            </div>
+                            <a href="javascript:void(0)" class="fw-bold text-danger small remove_option mt-n1 d-block">
+                                <i class="fas fa-times"></i> Remove
+                            </a>
                         </div>
                     `);
                 });
