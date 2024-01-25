@@ -37,7 +37,7 @@
 
         function switchFullscreen()
         {
-            /* var fullscreen = $("#fullscreen_btn").attr('data-fullscreen');
+            var fullscreen = $("#fullscreen_btn").attr('data-fullscreen');
             if(fullscreen == '1')
             {
                 closeFullscreen();
@@ -45,7 +45,7 @@
             }else{
                 openFullscreen();
                 $("#fullscreen_btn").attr('data-fullscreen', '1');
-            } */
+            }
         }
 
         /* View in fullscreen */

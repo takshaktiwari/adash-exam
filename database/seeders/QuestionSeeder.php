@@ -20,7 +20,7 @@ class QuestionSeeder extends Seeder
     public function run()
     {
         for ($i = 0; $i < 500; $i++) {
-            $question = $this->createQuestion();
+            $question = $this->createQuestion(null, ($i % 4) == 0);
 
             if (($i % 4) == 0) {
                 for ($j = 0; $j < rand(2, 10); $j++) {
@@ -30,7 +30,7 @@ class QuestionSeeder extends Seeder
         }
     }
 
-    public function createQuestion($parentQuestion = null)
+    public function createQuestion($parentQuestion = null, $optionImg = false)
     {
         $arr = [0, 1, 0, 0, 0, 0, 1];
         shuffle($arr);
@@ -52,9 +52,18 @@ class QuestionSeeder extends Seeder
         $question->save();
 
         for ($j = 0; $j < rand(2, 5); $j++) {
+            $option_img = str()->of(microtime())->slug('-')
+                    ->prepend('options/')
+                    ->append('.jpg');
+
+            Picsum::dimensions(rand(2, 6) * 100, rand(2, 6) * 100)
+                ->save(Storage::disk('public')->path($option_img))
+                ->destroy();
+
             QuestionOption::create([
                 'question_id'    =>    $question->id,
                 'option_text'    =>    fake()->realText(rand(20, 200), 2),
+                'option_img'    =>    $option_img,
                 'correct_ans'    => false
             ]);
         }

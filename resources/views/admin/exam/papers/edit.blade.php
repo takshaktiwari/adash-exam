@@ -60,8 +60,8 @@
                         <label for="">Status<span class="text-danger">*</span></label>
                         <select name="status" class="form-control" required>
                             <option value="">-- Select --</option>
-                            <option value="1" {{ ($paper->status == '1') ? 'selected' : '' }} >Active</option>
-                            <option value="0" {{ ($paper->status == '0') ? 'selected' : '' }} >Inactive</option>
+                            <option value="1" {{ $paper->status == '1' ? 'selected' : '' }}>Active</option>
+                            <option value="0" {{ $paper->status == '0' ? 'selected' : '' }}>Inactive</option>
                         </select>
                     </div>
                 </div>
@@ -81,10 +81,11 @@
                     <div class="form-group ">
                         <div class="form-check">
                             <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" id="has_sections" name="has_sections" value="1" {{ $paper->sections->count() ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" id="has_sections" name="has_sections"
+                                    value="1" {{ $paper->sections->count() ? 'checked' : '' }}>
                                 <span>Is this paper has question sections / groups</span>
                             </label>
-                          </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -92,22 +93,26 @@
                         <label for="">Shuffle Questions<span class="text-danger">*</span></label>
                         <select name="shuffle_questions" class="form-control" required>
                             <option value="">-- Select --</option>
-                            <option value="1" {{ ($paper->shuffle_questions == '1') ? 'selected' : '' }} >Shuffle</option>
-                            <option value="0" {{ ($paper->shuffle_questions == '0') ? 'selected' : '' }} >Don't Shuffle</option>
+                            <option value="1" {{ $paper->shuffle_questions == '1' ? 'selected' : '' }}>Shuffle
+                            </option>
+                            <option value="0" {{ $paper->shuffle_questions == '0' ? 'selected' : '' }}>Don't
+                                Shuffle</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="">Has Security Code (optional)</label>
-                        <input type="text" name="security_code" value="{{ old('security_code', $paper->security_code) }}" class="form-control">
+                        <input type="text" name="security_code"
+                            value="{{ old('security_code', $paper->security_code) }}" class="form-control">
                         <span class="small">Security code need to be entered to start the exam if has code</span>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="">Attempts Limit (optional)</label>
-                        <input type="number" name="attempts_limit" value="{{ old('attempts_limit', $paper->attempts_limit) }}" class="form-control">
+                        <input type="number" name="attempts_limit"
+                            value="{{ old('attempts_limit', $paper->attempts_limit) }}" class="form-control">
                         <span class="small">Limit the attemts a user will get. Blank will be unlimited.</span>
                     </div>
                 </div>
@@ -118,13 +123,24 @@
             </div>
         </div>
         <div class="card-footer">
-            <input type="submit" class="btn btn-dark px-4">
+            <button type="submit" class="btn btn-dark px-4" id="question_submit_btn">
+                <i class="fas fa-save"></i> Submit
+            </button>
         </div>
     </form>
 
     @push('scripts')
         <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
         <script>
+            var time = 0;
+            var notificationInterval = setInterval(() => {
+                $("body").find('.tox .tox-notifications-container').css('display', 'none');
+                time++;
+                if (time > 5) {
+                    clearInterval(notificationInterval);
+                }
+            }, 1000);
+
             tinymce.init({
                 selector: '.text-editor',
                 plugins: 'print preview paste importcss searchreplace autolink autosave directionality code visualblocks visualchars fullscreen image link codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap emoticons',

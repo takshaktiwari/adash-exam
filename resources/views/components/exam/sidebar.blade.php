@@ -91,13 +91,13 @@
                             @endphp
                             @foreach ($section->questions as $sQuestion)
                                 <a href="{{ route('exam.paper', [$paper, 'question_id' => $sQuestion->id]) }}"
-                                    class="question_item btn btn-sm btn-light bg-{{ $getQuestionClass($sQuestion) }} border">
+                                    class="question_item btn btn-sm btn-light bg-{{ $getQuestionClass($sQuestion) }} border" data-section="{{ $section->id }}">
                                     {{ $sl++ }}
                                 </a>
 
                                 @foreach ($question->children as $childQuestion)
                                     <a href="{{ route('exam.paper', [$paper, 'question_id' => $childQuestion->id]) }}"
-                                        class="question_item btn btn-sm btn-light bg-{{ $getQuestionClass($childQuestion) }} border">
+                                        class="question_item btn btn-sm btn-light bg-{{ $getQuestionClass($childQuestion) }} border" data-section="{{ $section->id }}">
                                         {{ $sl++ }}
                                     </a>
                                 @endforeach

@@ -155,56 +155,55 @@ class QuestionController extends Controller
             'question_group_id' => 'required|array|min:1'
         ]);
 
-        try {
-            $question->question_id = $request->post('question_id');
-            $question->question = $request->post('question');
-            $question->answer   = $request->post('answer');
-            $question->marks    = $request->post('marks');
+        $question->question_id = $request->post('question_id');
+        $question->question = $request->post('question');
+        $question->answer   = $request->post('answer');
+        $question->marks    = $request->post('marks');
 
-            if ($request->file('image')) {
-                $question->image = str()->of(microtime())->slug('-')
-                    ->prepend('questions/')
-                    ->append('.' . $request->file('image')->extension());
-                Imager::init($request->file('image'))
-                    ->resizeWidth(400)
-                    ->save(Storage::disk('public')->path($question->image));
-            }
-            $question->save();
-
-            QuestionOption::where('question_id', $question->id)->delete();
-
-            foreach ($request->input('ques_option') as $key => $ques_option) {
-                if (empty($ques_option) && empty($request->file('ques_option_img')[$key])) {
-                    continue;
-                }
-
-                $questionOption = new QuestionOption();
-                $questionOption->question_id = $question->id;
-                $questionOption->option_text = $ques_option;
-                $questionOption->correct_ans = ($key == $request->input('correct_ans')) ? true : false;
-
-                if (!empty($request->file('ques_option_img')[$key])) {
-                    $questionOption->option_img = str()->of(microtime())->slug('-')
-                        ->prepend('options/')
-                        ->append('.')
-                        ->append($request->file('ques_option_img')[$key]->extension());
-
-                    Imager::init($request->file('ques_option_img')[$key])
-                        ->resizeWidth(400)
-                        ->save(Storage::disk('public')->path($questionOption->option_img))
-                        ->destroy();
-                }
-
-                $questionOption->save();
-            }
-
-            $question->questionGroups()->sync($request->question_group_id);
-            cache()->forget('question_' . $question->id);
-
-            return redirect()->back()->withErrors('UPDATED !! Question is successfully updated');
-        } catch (\Exception $e) {
-            return back()->withErrors($e->getMessage());
+        if ($request->file('image')) {
+            $question->image = str()->of(microtime())->slug('-')
+                ->prepend('questions/')
+                ->append('.' . $request->file('image')->extension());
+            Imager::init($request->file('image'))
+                ->resizeWidth(400)
+                ->save(Storage::disk('public')->path($question->image));
         }
+        $question->save();
+
+
+        QuestionOption::where('question_id', $question->id)->delete();
+
+        foreach ($request->input('ques_option') as $key => $ques_option) {
+            if (empty($ques_option) && empty($request->file('ques_option_img')[$key]) && empty($request->input('option_imgs')[$key])) {
+                continue;
+            }
+
+            $questionOption = new QuestionOption();
+            $questionOption->question_id = $question->id;
+            $questionOption->option_text = $ques_option;
+            $questionOption->correct_ans = ($key == $request->input('correct_ans')) ? true : false;
+
+            if (!empty($request->input('option_imgs')[$key])) {
+                $questionOption->option_img = $request->input('option_imgs')[$key];
+            } elseif (!empty($request->file('ques_option_img')[$key])) {
+                $questionOption->option_img = str()->of(microtime())->slug('-')
+                    ->prepend('options/')
+                    ->append('.')
+                    ->append($request->file('ques_option_img')[$key]->extension());
+
+                Imager::init($request->file('ques_option_img')[$key])
+                    ->resizeWidth(400)
+                    ->save(Storage::disk('public')->path($questionOption->option_img))
+                    ->destroy();
+            }
+
+            $questionOption->save();
+        }
+
+        $question->questionGroups()->sync($request->question_group_id);
+        cache()->forget('question_' . $question->id);
+
+        return redirect()->back()->withErrors('UPDATED !! Question is successfully updated');
     }
 
     public function destroy($id)
@@ -278,7 +277,7 @@ class QuestionController extends Controller
         }
 
         if ($questionIds && $questionIds->count()) {
-            $questionIds = $questionIds->map(fn ($item) => "'" . $item . "'")->implode(',');
+            $questionIds = $questionIds->map(fn($item) => "'" . $item . "'")->implode(',');
         } else {
             $questionIds = null;
         }
@@ -363,7 +362,7 @@ class QuestionController extends Controller
         $childrenQuestionIds = $questionIds;
 
         if ($questionIds && $questionIds->count()) {
-            $questionIds = $questionIds->map(fn ($item) => "'" . $item . "'")->implode(',');
+            $questionIds = $questionIds->map(fn($item) => "'" . $item . "'")->implode(',');
         } else {
             $questionIds = null;
         }

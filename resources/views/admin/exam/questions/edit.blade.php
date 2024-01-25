@@ -63,9 +63,9 @@
                 <label for="">Parent Question</label>
                 <select name="question_id" id="question_id" class="form-control select2">
                     <option value="">-- Select --</option>
-                    @foreach ($questions as $question)
-                        <option value="{{ $question->id }}">
-                            {{ strip_tags($question->question) }}
+                    @foreach ($questions as $ques)
+                        <option value="{{ $ques->id }}" @selected($question->question_id == $ques->id)>
+                            {{ strip_tags($ques->question) }}
                         </option>
                     @endforeach
                 </select>
@@ -80,8 +80,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="">Descriptive Answer </label>
-                        <textarea name="answer" rows="4" class="form-control text-editor" placeholder="Describe your answer"
-                            maxlength="499">{{ $question->answer }}</textarea>
+                        <textarea name="answer" rows="4" class="form-control text-editor" placeholder="Describe your answer">{{ $question->answer }}</textarea>
                     </div>
                 </div>
             </div>
@@ -132,11 +131,12 @@
                                     @endif
                                     <input type="file" name="ques_option_img[{{ $key }}]"
                                         class="form-control rounded-0" accept="image/*">
+                                    <input type="hidden" name="option_imgs[{{ $key }}]" value="{{ $ques_option->option_img }}">
                                 </div>
                                 <div class="flex-fill">
                                     <input type="text" name="ques_option[{{ $key }}]"
                                         class="form-control rounded-0" placeholder="Option Choice {{ $key }}"
-                                        value="{{ $ques_option->option_text }}" maxlength="250" required="">
+                                        value="{{ $ques_option->option_text }}" maxlength="250" >
                                 </div>
 
                                 <label class="mb-0">
@@ -196,13 +196,13 @@
                             <div class="d-flex">
                                 <div>
                                     <input type="file" name="ques_option_img[${newOptionCount}]"
-                                        class="form-control rounded-0">
+                                        class="form-control rounded-0" accept="image/*">
                                 </div>
                                 <div class="flex-fill">
                                     <input type="text" name="ques_option[${newOptionCount}]"
                                         class="form-control rounded-0"
                                         placeholder="Option Choice ${newOptionCount}"
-                                        value="" maxlength="250" required="">
+                                        value="" maxlength="250">
                                 </div>
 
                                 <label class="mb-0">

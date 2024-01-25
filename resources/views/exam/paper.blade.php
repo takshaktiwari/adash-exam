@@ -142,13 +142,24 @@
                                     <input type="radio" class="form-check-input" id="option_{{ $option->id }}"
                                         name="user_option" value="{{ $option->id }}" required
                                         {{ $userQuestion?->user_option_id == $option->id ? 'checked' : '' }}>
-                                    <span>{{ $option->option_text }}</span>
+
+                                    <div class="d-flex gap-2">
+                                        @if ($option->option_img)
+                                            <img src="{{ storage($option->option_img) }}" alt="option_img"
+                                                class="rounded mb-2" style="max-height: 150px;">
+                                        @endif
+                                        @if ($option->option_text)
+                                            <p class="mb-0">{{ $option->option_text }}</p>
+                                        @endif
+                                    </div>
+
                                 </label>
                             </div>
                         @endforeach
                     </ul>
 
-                    <div class="text-end mt-3" id="reset_button" style="display: {{ $userQuestion?->user_option_id ? 'block' : 'none' }}">
+                    <div class="text-end mt-3" id="reset_button"
+                        style="display: {{ $userQuestion?->user_option_id ? 'block' : 'none' }}">
                         <a href="{{ route('exam.question-reset', [$paper, $question]) }}"
                             class="btn btn-sm btn-danger px-3"> <i class="fas fa-times"></i> Reset</a>
                     </div>

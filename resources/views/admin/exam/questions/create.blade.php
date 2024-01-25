@@ -116,7 +116,7 @@
                                 <div class="flex-fill">
                                     <input type="text" name="ques_option[{{ $i }}]"
                                         class="form-control rounded-0" placeholder="Option Choice {{ $i }}"
-                                        value="{{ old('ques_option')[$i] ?? '' }}" maxlength="250" required="">
+                                        value="{{ old('ques_option')[$i] ?? '' }}" maxlength="250" >
                                 </div>
 
                                 <label class="mb-0">
@@ -185,13 +185,13 @@
                             <div class="d-flex">
                                 <div>
                                     <input type="file" name="ques_option_img[${newOptionCount}]"
-                                        class="form-control rounded-0">
+                                        class="form-control rounded-0" accept="image/*">
                                 </div>
                                 <div class="flex-fill">
                                     <input type="text" name="ques_option[${newOptionCount}]"
                                         class="form-control rounded-0"
                                         placeholder="Option Choice ${newOptionCount}"
-                                        value="" maxlength="250" required="">
+                                        value="" maxlength="250" >
                                 </div>
 
                                 <label class="mb-0">

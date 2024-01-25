@@ -138,10 +138,12 @@ class ExamController extends Controller
 
         $paper->unsetRelation('sections');
         $paper->unsetRelation('questions');
+
         $arr = session('exam', []);
         $arr['paper'] = $paper->toArray();
         $arr['user_paper'] = $userPaper->toArray();
         $arr['questions'] = $questionIds->toArray();
+        $arr['sections'] = $paper->sections->pluck('id')->toArray();
         $arr['start_at'] = now()->format('Y-m-d H:i:s');
         $arr['end_at'] = now()->addMinutes($paper->total_time)->format('Y-m-d H:i:s');
 
@@ -227,10 +229,12 @@ class ExamController extends Controller
         $question = cache()->remember(
             'question_' . $question_id,
             60 * 60 * 6, // for 6 hrs
-            function () use ($question_id) {
+            function () use ($question_id, $paper) {
                 return Question::with('options')
                     ->with('correctOption')
-                    ->with('sections')
+                    ->with(['sections' => function ($query) use ($paper) {
+                        $query->where('paper_question_section.paper_id', $paper->id);
+                    }])
                     ->find($question_id);
             }
         );
