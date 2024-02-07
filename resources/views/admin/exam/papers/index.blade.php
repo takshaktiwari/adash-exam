@@ -36,7 +36,12 @@
                                     {{ $paper->status() }}
                                 </span>
                             </td>
-                            <td>{{ $paper?->sections_count }}</td>
+                            <td>
+                                {{ $paper?->sections_count }}
+                                @if ($paper->lock_sections)
+                                    <i class="fas fa-lock small"></i>
+                                @endif
+                            </td>
                             <td>{{ $paper?->questions_count }}</td>
                             <td>{{ $paper->questions_sum_marks }}</td>
                             <td>{{ $paper->total_time }} <span class="small">Min.</span></td>
@@ -57,15 +62,16 @@
                                     class="btn btn-sm btn-primary load-circle" title="Paper Questions">
                                     <i class="fas fa-info-circle"></i>
                                 </a>
-                                <a href="{{ route('admin.exam.papers.edit', [$paper]) }}" class="btn btn-sm btn-success"
-                                    title="Edit Paper">
+                                <a href="{{ route('admin.exam.papers.edit', [$paper]) }}"
+                                    class="btn btn-sm btn-success" title="Edit Paper">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('admin.exam.papers.destroy', [$paper]) }}"
                                     class="d-inline-block" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button href="" class="btn btn-sm btn-danger delete-alert" title="Delete Date Slot">
+                                    <button href="" class="btn btn-sm btn-danger delete-alert"
+                                        title="Delete Date Slot">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>

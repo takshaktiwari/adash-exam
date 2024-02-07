@@ -109,8 +109,11 @@
         <div class="col-md-6">
             @if ($paper->sections->count())
                 <div class="card shadow-sm">
-                    <div class="card-header">
+                    <div class="card-header d-flex gap-2">
                         <h5 class="my-auto">Question Sections / Groups</h5>
+                        @if ($paper->lock_sections)
+                            <i class="fas fa-lock my-auto"></i>
+                        @endif
                     </div>
                     <div class="card-body table-responsive">
                         <table class="table" id="paper_sections">

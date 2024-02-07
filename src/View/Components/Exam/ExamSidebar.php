@@ -13,6 +13,7 @@ class ExamSidebar extends Component
     public $markedCount;
     public $markedIds;
     public $forReviewCount;
+    public $sections = [];
 
     public function __construct(public $paper, public $userQuestions, public $question)
     {
@@ -21,13 +22,30 @@ class ExamSidebar extends Component
         $this->markedIds = $this->userQuestions->where('status', 'marked')->pluck('id');
         $this->markedCount = $this->userQuestions->where('status', 'marked')->count();
         $this->forReviewCount = $this->userQuestions->where('status', 'mark_review')->count();
+
+        if($this->paper?->sections?->count()){
+            $this->sections = $this->paper->sections->map(function ($section) {
+                $questions = [];
+                foreach ($section->questions as $question) {
+                    $questions[] = $question->id;
+                    foreach ($question->children ?? [] as $child) {
+                        $questions[] = $child->id;
+                    }
+                }
+
+                unset($section->questions);
+                $section->questions = $questions;
+
+                return $section;
+            });
+        }
     }
 
-    public function getQuestionClass($question)
+    public function getQuestionClass($questionId)
     {
-        $userQuestion = $this->userQuestions->where('question_id', $question->id)->first();
+        $userQuestion = $this->userQuestions->where('question_id', $questionId)->first();
 
-        if(!$userQuestion) {
+        if (!$userQuestion) {
             return 'not-answered';
         }
 

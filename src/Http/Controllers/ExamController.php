@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Takshak\Exam\Models\Paper;
 use Illuminate\Support\Facades\View;
+use Takshak\Exam\Models\PaperSection;
 use Takshak\Exam\Models\Question;
 use Takshak\Exam\Models\QuestionOption;
 use Takshak\Exam\Models\UserPaper;
@@ -144,6 +145,7 @@ class ExamController extends Controller
         $arr['user_paper'] = $userPaper->toArray();
         $arr['questions'] = $questionIds->toArray();
         $arr['sections'] = $paper->sections->pluck('id')->toArray();
+        $arr['current_section'] = $paper->sections->pluck('id')->first();
         $arr['start_at'] = now()->format('Y-m-d H:i:s');
         $arr['end_at'] = now()->addMinutes($paper->total_time)->format('Y-m-d H:i:s');
 
@@ -154,6 +156,40 @@ class ExamController extends Controller
 
     public function paper(Request $request, $paper_id)
     {
+        if ($request->get('submit_section')) {
+            /**
+             * Submitting the sections and going to next question of next section.
+             * change current section id in section to next section
+             * question will be changed when there is next section and question
+             */
+            $sectionKey = null;
+            foreach (session('exam.sections') as $key => $section) {
+                if ($section == $request->get('submit_section')) {
+                    $sectionKey = $key;
+                    break;
+                }
+            }
+
+            $questionKey = null;
+            foreach (session('exam.questions') as $key => $question) {
+                if ($question == $request->get('question_id')) {
+                    $questionKey = $key;
+                    break;
+                }
+            }
+
+            if (session('exam.sections.' . $sectionKey + 1) && session('exam.questions.' . $questionKey + 1)) {
+                $arr = session('exam', []);
+                $arr['current_section'] = session('exam.sections.' . $sectionKey + 1);
+                session(['exam' => $arr]);
+
+                return redirect()->route('exam.paper', [
+                    $paper_id,
+                    'question_id' => session('exam.questions.' . $questionKey + 1)
+                ]);
+            }
+        }
+
         $paper = cache()->remember(
             'paper_' . $paper_id,
             60 * 60 * 6, // for 6 hrs
@@ -225,6 +261,31 @@ class ExamController extends Controller
                     ->first();
             }
         );
+
+        if ($paper?->sections?->count() && session('exam.paper.lock_sections')) {
+            # checking if the current question is in the current section's questions list
+            # if not then redirect to last question of current section
+            $section = PaperSection::where('id', session('exam.current_section'))
+                ->with(['questions' => function ($query) use ($questionsIdsForFilter) {
+                    $query->whereNull('questions.question_id');
+                    $query->select('questions.id', 'questions.question_id');
+                    $query->with('children:id,question_id');
+                    $query->orderByRaw("FIELD(questions.id, {$questionsIdsForFilter})");
+                }])
+                ->first();
+
+            $sectionQuestions = [];
+            foreach ($section->questions as $question) {
+                $sectionQuestions[] = $question->id;
+                foreach ($question->children ?? [] as $child) {
+                    $sectionQuestions[] = $child->id;
+                }
+            }
+
+            if(!in_array($question_id, $sectionQuestions)){
+                return redirect()->route('exam.paper', [$paper, 'question_id' => end($sectionQuestions)]);
+            }
+        }
 
         $question = cache()->remember(
             'question_' . $question_id,

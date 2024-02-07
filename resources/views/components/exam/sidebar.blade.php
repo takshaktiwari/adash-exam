@@ -75,6 +75,10 @@
 
     <div class="question_section ">
         @if ($paper->sections_count)
+            @php
+                $sl = 1;
+            @endphp
+
             @foreach ($paper->sections as $section)
                 <div class="section mb-2 px-3 border-bottom border-secondary">
                     <a href="" class="list-group-item py-2 d-flex justify-content-between"
@@ -83,27 +87,27 @@
                         <span><i class="fa-solid fa-arrow-right"></i></span>
                     </a>
 
-                    <div class="pb-2 {{ !$question->sections->pluck('id')->contains($section->id) ? 'collapse' : '' }}"
-                        id="section_{{ $section->id }}">
-                        <div class="d-flex flex-wrap gap-2">
-                            @php
-                                $sl = 1;
-                            @endphp
-                            @foreach ($section->questions as $sQuestion)
-                                <a href="{{ route('exam.paper', [$paper, 'question_id' => $sQuestion->id]) }}"
-                                    class="question_item btn btn-sm btn-light bg-{{ $getQuestionClass($sQuestion) }} border" data-section="{{ $section->id }}">
-                                    {{ $sl++ }}
-                                </a>
+                    @if (!$paper->lock_sections || ($paper->lock_sections && session('exam.current_section') == $section->id))
+                        <div class="pb-2 {{ !$question->sections->pluck('id')->contains($section->id) ? 'collapse' : '' }}"
+                            id="section_{{ $section->id }}">
+                            <div class="d-flex flex-wrap gap-2">
 
-                                @foreach ($question->children as $childQuestion)
-                                    <a href="{{ route('exam.paper', [$paper, 'question_id' => $childQuestion->id]) }}"
-                                        class="question_item btn btn-sm btn-light bg-{{ $getQuestionClass($childQuestion) }} border" data-section="{{ $section->id }}">
+                                @foreach ($section->questions as $questionId)
+                                    <a href="{{ route('exam.paper', [$paper, 'question_id' => $questionId]) }}"
+                                        class="question_item btn btn-sm btn-light bg-{{ $getQuestionClass($questionId) }} border"
+                                        data-section="{{ $section->id }}">
                                         {{ $sl++ }}
                                     </a>
                                 @endforeach
-                            @endforeach
+                                @if (!$loop->last && $paper->lock_sections && session('exam.current_section') == $section->id)
+                                    <a href="{{ route('exam.paper', [$paper, 'question_id' => $questionId, 'submit_section' => $section->id]) }}"
+                                        class="btn btn-sm btn-primary" data-section="{{ $section->id }}">
+                                        Submit
+                                    </a>
+                                @endif
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             @endforeach
         @else

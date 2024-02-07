@@ -86,6 +86,18 @@
                                 <span>Is this paper has question sections / groups</span>
                             </label>
                         </div>
+
+                        <div class="form-check ms-3" id="lock_sections_checkbox" style="display: none;">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" id="lock_sections" name="lock_sections"
+                                    value="1" {{ $paper->lock_sections ? 'checked' : '' }}>
+                                <span class="d-block">
+                                    Lock sections
+                                    <span class="small d-block fw-normal">Other section will only be active when first
+                                        one completed</span>
+                                </span>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -136,10 +148,20 @@
             var notificationInterval = setInterval(() => {
                 $("body").find('.tox .tox-notifications-container').css('display', 'none');
                 time++;
-                if (time > 5) {
+                if (time > 10) {
                     clearInterval(notificationInterval);
                 }
             }, 1000);
+
+            lockSections();
+            $("#has_sections").change(() => lockSections());
+            function lockSections() {
+                if ($("#has_sections").is(':checked')) {
+                    $("#lock_sections_checkbox").fadeIn('fast')
+                } else {
+                    $("#lock_sections_checkbox").fadeOut('fast')
+                }
+            }
 
             tinymce.init({
                 selector: '.text-editor',
