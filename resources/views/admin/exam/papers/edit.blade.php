@@ -142,19 +142,12 @@
     </form>
 
     @push('scripts')
-        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+        <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
         <script>
-            var time = 0;
-            var notificationInterval = setInterval(() => {
-                $("body").find('.tox .tox-notifications-container').css('display', 'none');
-                time++;
-                if (time > 10) {
-                    clearInterval(notificationInterval);
-                }
-            }, 1000);
-
             lockSections();
             $("#has_sections").change(() => lockSections());
+
             function lockSections() {
                 if ($("#has_sections").is(':checked')) {
                     $("#lock_sections_checkbox").fadeIn('fast')
@@ -163,16 +156,12 @@
                 }
             }
 
-            tinymce.init({
-                selector: '.text-editor',
-                plugins: 'print preview paste importcss searchreplace autolink autosave directionality code visualblocks visualchars fullscreen image link codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap emoticons',
-                imagetools_cors_hosts: ['picsum.photos'],
-                menubar: 'file edit view insert format tools table help',
-                toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview print | insertfile image link codesample',
-                toolbar_sticky: true,
-                autosave_ask_before_unload: true,
-                height: 400,
-                toolbar_mode: 'sliding',
+            $(document).ready(function() {
+                $('.text-editor').summernote({
+                    placeholder: 'Write instructions here',
+                    tabsize: 4,
+                    height: 200
+                });
             });
         </script>
     @endpush

@@ -116,7 +116,7 @@
                                 <div class="flex-fill">
                                     <input type="text" name="ques_option[{{ $i }}]"
                                         class="form-control rounded-0" placeholder="Option Choice {{ $i }}"
-                                        value="{{ old('ques_option')[$i] ?? '' }}" maxlength="250" >
+                                        value="{{ old('ques_option')[$i] ?? '' }}" maxlength="250">
                                 </div>
 
                                 <label class="mb-0">
@@ -143,30 +143,15 @@
     </form>
 
     @push('scripts')
-        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-        <script>
-            tinymce.init({
-                selector: '.text-editor',
-                plugins: 'print preview paste importcss searchreplace autolink autosave directionality code visualblocks visualchars fullscreen image link codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap emoticons',
-                imagetools_cors_hosts: ['picsum.photos'],
-                menubar: 'file edit view insert format tools table help',
-                toolbar: 'bold italic underline strikethrough alignleft aligncenter alignright alignjustify numlist bullist charmap outdent indent | fontselect fontsizeselect formatselect | forecolor backcolor |  emoticons preview link',
-                toolbar_sticky: true,
-                autosave_ask_before_unload: true,
-                height: 250,
-                toolbar_mode: 'sliding',
-            });
-        </script>
+        <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
         <script>
             $(document).ready(function() {
-                var time = 0;
-                var notificationInterval = setInterval(() => {
-                    $("body").find('.tox .tox-notifications-container').css('display', 'none');
-                    time++;
-                    if(time > 5){
-                        clearInterval(notificationInterval);
-                    }
-                }, 1000);
+                $('.text-editor').summernote({
+                    placeholder: 'Write here',
+                    tabsize: 4,
+                    height: 200
+                });
 
                 $("#question_submit_btn").click(function() {
                     var correctAnsVal = $('input[name="correct_ans"]:checked').val();

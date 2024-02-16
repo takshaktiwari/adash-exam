@@ -83,7 +83,7 @@
                         <div class="form-check ms-3" id="lock_sections_checkbox" style="display: none;">
                             <label class="form-check-label">
                                 <input class="form-check-input" type="checkbox" id="lock_sections" name="lock_sections"
-                                    value="1" >
+                                    value="1">
                                 <span class="d-block">
                                     Lock sections
                                     <span class="small d-block fw-normal">Other section will only be active when first
@@ -120,18 +120,21 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="">
                 <label for="">Question Paper Instruction <span class="text-danger">*</span></label>
                 <textarea name="instruction" rows="4" class="form-control text-editor">{{ old('instruction') }}</textarea>
             </div>
         </div>
         <div class="card-footer">
-            <input type="submit" class="btn btn-dark px-4">
+            <button type="submit" class="btn btn-dark px-4">
+                <i class="fas fa-save"></i> Submit
+            </button>
         </div>
     </form>
 
     @push('scripts')
-        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+        <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
         <script>
             lockSections();
             $("#has_sections").change(() => lockSections());
@@ -144,25 +147,12 @@
                 }
             }
 
-            var time = 0;
-            var notificationInterval = setInterval(() => {
-                $("body").find('.tox .tox-notifications-container').css('display', 'none');
-                time++;
-                if (time > 10) {
-                    clearInterval(notificationInterval);
-                }
-            }, 1000);
-
-            tinymce.init({
-                selector: '.text-editor',
-                plugins: 'print preview paste importcss searchreplace autolink autosave directionality code visualblocks visualchars fullscreen image link codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap emoticons',
-                imagetools_cors_hosts: ['picsum.photos'],
-                menubar: 'file edit view insert format tools table help',
-                toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview print | insertfile image link codesample',
-                toolbar_sticky: true,
-                autosave_ask_before_unload: true,
-                height: 400,
-                toolbar_mode: 'sliding',
+            $(document).ready(function() {
+                $('.text-editor').summernote({
+                    placeholder: 'Write instructions here',
+                    tabsize: 4,
+                    height: 200
+                });
             });
         </script>
     @endpush
