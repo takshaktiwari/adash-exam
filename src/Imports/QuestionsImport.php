@@ -37,20 +37,27 @@ class QuestionsImport implements ToModel, WithBatchInserts, WithHeadingRow, With
             return null;
         }
 
-        if(!empty($this->row['id']))
-        {
+        if(!empty($this->row['id'])) {
             $question = Question::where('id', $this->row['id'])->first();
         }
 
-        if(!$question){
+        if(empty($question)) {
             $question = Question::where('question', $this->row['question'])->first();
         }
 
+        $parent_id = null;
+        if(isset($this->row['parent_id'])){
+            $parent_id = $this->row['parent_id'];
+        }
+        if(isset($this->row['parent'])){
+            $parent_id = $this->row['parent'];
+        }
+
         $object = [
-            'question_id'    =>    $this->row['parent_id'],
-            'question'    =>    $this->row['question'],
-            'answer'    =>    $this->row['answer'],
-            'marks'     =>  $this->row['marks'],
+            'question_id'   => $parent_id,
+            'question'      => $this->row['question'],
+            'answer'        => $this->row['answer'],
+            'marks'         => $this->row['marks'],
         ];
 
         if ($question) {

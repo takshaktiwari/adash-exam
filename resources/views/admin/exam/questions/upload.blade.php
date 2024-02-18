@@ -44,8 +44,9 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <input type="submit" class="btn btn-dark px-4">
-
+                    <button type="submit" class="btn btn-dark px-4">
+                        <i class="fas fa-save"></i> Submit
+                    </button>
                 </div>
             </form>
         </div>

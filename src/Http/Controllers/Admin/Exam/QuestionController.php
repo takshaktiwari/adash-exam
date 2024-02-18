@@ -243,7 +243,7 @@ class QuestionController extends Controller
                 'import-question-' . time() . '.' . $request->file('upload_file')->extension()
             );
 
-        //set_time_limit(0);
+
         try {
             Excel::import(new QuestionsImport(), Storage::path($imported_file));
             return redirect()->route('admin.exam.questions.index')->withErrors('SUCCESS !! Question List is successfully updated');
@@ -277,7 +277,7 @@ class QuestionController extends Controller
         }
 
         if ($questionIds && $questionIds->count()) {
-            $questionIds = $questionIds->map(fn($item) => "'" . $item . "'")->implode(',');
+            $questionIds = $questionIds->map(fn ($item) => "'" . $item . "'")->implode(',');
         } else {
             $questionIds = null;
         }
@@ -362,7 +362,7 @@ class QuestionController extends Controller
         $childrenQuestionIds = $questionIds;
 
         if ($questionIds && $questionIds->count()) {
-            $questionIds = $questionIds->map(fn($item) => "'" . $item . "'")->implode(',');
+            $questionIds = $questionIds->map(fn ($item) => "'" . $item . "'")->implode(',');
         } else {
             $questionIds = null;
         }
