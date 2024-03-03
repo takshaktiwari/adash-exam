@@ -4,6 +4,7 @@ namespace Takshak\Exam\View\Components\Exam;
 
 use Illuminate\View\Component;
 use Illuminate\Support\Facades\View;
+use Takshak\Exam\Models\Question;
 use Takshak\Exam\Models\UserQuestion;
 
 class ExamSidebar extends Component
@@ -23,7 +24,7 @@ class ExamSidebar extends Component
         $this->markedCount = $this->userQuestions->where('status', 'marked')->count();
         $this->forReviewCount = $this->userQuestions->where('status', 'mark_review')->count();
 
-        if($this->paper?->sections?->count()){
+        if($this->paper?->sections?->count()) {
             $this->sections = $this->paper->sections->map(function ($section) {
                 $questions = [];
                 foreach ($section->questions as $question) {
@@ -43,6 +44,7 @@ class ExamSidebar extends Component
 
     public function getQuestionClass($questionId)
     {
+        $questionId = $questionId instanceof Question ? $questionId->id : $questionId;
         $userQuestion = $this->userQuestions->where('question_id', $questionId)->first();
 
         if (!$userQuestion) {
