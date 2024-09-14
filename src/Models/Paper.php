@@ -70,6 +70,13 @@ class Paper extends Model
         return $this->status ? 'Active' : 'Inactive';
     }
 
+    public function notExpired()
+    {
+        if ($this->expire_at > now() && $this->activate_at < now()) {
+            return true;
+        }
+    }
+
     public function hasAttempts()
     {
         if(!$this->attempts_limit){
