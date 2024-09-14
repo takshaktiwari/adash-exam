@@ -49,8 +49,12 @@ class Paper extends Model
 
     public function scopeActive(Builder $query)
     {
-        return $query->where('status', true)
-            ->where('expire_at', '>', now())
+        return $query->where('status', true);
+    }
+
+    public function scopeNotExpired(Builder $query)
+    {
+        return $query->where('expire_at', '>', now())
             ->where('activate_at', '<', now());
     }
 
