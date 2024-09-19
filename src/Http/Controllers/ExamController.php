@@ -232,6 +232,11 @@ class ExamController extends Controller
             }
         );
 
+        if (!$userPaper) {
+            return to_route('exam.start', [session('exam.paper.id')])
+                ->withErrors('Sorry !! User paper has not created, please start the exam again');
+        }
+
         $paper = cache()->remember(
             'user_paper_paper_' . session('exam.user_paper.id'),
             60 * 60 * 6, // for 6 hrs
