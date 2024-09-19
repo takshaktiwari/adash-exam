@@ -390,6 +390,10 @@ class ExamController extends Controller
 
     public function questionMark(Request $request, $paper_id, $question_id)
     {
+        if (!session('exam.user_paper.id')) {
+            return redirect()->route('exam.papers')->withErrors('SORRY !! You need to start the exam again');
+        }
+        
         $paper = cache()->remember(
             'paper_' . $paper_id,
             60 * 60 * 6, // for 6 hrs
