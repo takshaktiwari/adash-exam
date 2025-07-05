@@ -15,12 +15,14 @@ Route::middleware('web')->group(function () {
         ->prefix('admin/exam')
         ->name('admin.exam.')
         ->group(function () {
-            Route::get('questions/upload', [QuestionController::class, 'upload'])->name('questions.upload');
-            Route::post('questions/upload', [QuestionController::class, 'uploadDo'])->name('questions.upload.do');
-            Route::get('questions/sample-download', [QuestionController::class, 'sampleDownload'])->name('questions.sample-download');
-            Route::get('questions/bulk-delete', [QuestionController::class, 'bulkDelete'])->name('questions.bulk-delete');
-            Route::get('questions/export', [QuestionController::class, 'export'])->name('questions.export');
-            Route::get('questions/bind/{question}', [QuestionController::class, 'bind'])->name('questions.bind');
+            Route::prefix('questions')->name('questions.')->group(function () {
+                Route::get('upload', [QuestionController::class, 'upload'])->name('upload');
+                Route::post('upload', [QuestionController::class, 'uploadDo'])->name('upload.do');
+                Route::get('sample-download', [QuestionController::class, 'sampleDownload'])->name('sample-download');
+                Route::get('bulk-delete', [QuestionController::class, 'bulkDelete'])->name('bulk-delete');
+                Route::get('export', [QuestionController::class, 'export'])->name('export');
+                Route::get('bind/{question}', [QuestionController::class, 'bind'])->name('bind');
+            });
             Route::resource('questions', QuestionController::class);
 
             Route::resource('question-groups', QuestionGroupController::class);

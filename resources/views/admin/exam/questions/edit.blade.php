@@ -70,6 +70,18 @@
                     @endforeach
                 </select>
             </div>
+            @if (!$question->question_id)
+                <div class="text-end">
+                    <a href="javascript:void(0)" id="add_context" class="text-primary fs-6" data-bs-toggle="collapse"
+                        data-bs-target="#context_block">
+                        <i class="fas fa-plus"></i> Edit Context / Passage
+                    </a>
+                </div>
+                <div id="context_block" class="form-group collapse">
+                    <label for="">Context / Passage </label>
+                    <textarea name="context" rows="2" class="form-control text-editor" placeholder="Write your context">{{ old('context', $question->context) }}</textarea>
+                </div>
+            @endif
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -141,8 +153,8 @@
                                 </div>
 
                                 <label class="mb-0">
-                                    <input type="radio" name="correct_ans" value="{{ $key }}" required=""
-                                        {{ $ques_option->correct_ans == true ? 'checked' : '' }}>
+                                    <input type="radio" name="correct_ans" value="{{ $key }}"
+                                        required="" {{ $ques_option->correct_ans == true ? 'checked' : '' }}>
                                     <div class="answercheck form-control rounded-0"></div>
                                 </label>
                             </div>

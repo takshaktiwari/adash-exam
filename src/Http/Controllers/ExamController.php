@@ -301,6 +301,7 @@ class ExamController extends Controller
                     ->with(['sections' => function ($query) use ($paper) {
                         $query->where('paper_question_section.paper_id', $paper->id);
                     }])
+                    ->with('parent')
                     ->find($question_id);
             }
         );
@@ -393,7 +394,7 @@ class ExamController extends Controller
         if (!session('exam.user_paper.id')) {
             return redirect()->route('exam.papers')->withErrors('SORRY !! You need to start the exam again');
         }
-        
+
         $paper = cache()->remember(
             'paper_' . $paper_id,
             60 * 60 * 6, // for 6 hrs

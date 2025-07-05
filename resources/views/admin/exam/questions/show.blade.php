@@ -29,8 +29,16 @@
         @endif
         <div class="card-body">
             <div class="mb-4 lead">{!! nl2br($question->question) !!}</div>
-            <img src="{{ storage($question->image) }}" alt="question img" class="rounded-2" style="max-height: 200px">
+            @if ($question->image)
+                <img src="{{ storage($question->image) }}" alt="question img" class="rounded-2" style="max-height: 200px">
+            @endif
             <hr />
+            @if ($question->context)
+                <div class="context">
+                    {!! nl2br($question->context) !!}
+                </div>
+                <hr />
+            @endif
             <p class="mb-1"><b>Options:</b></p>
             <ul>
                 @foreach ($question->options as $option)

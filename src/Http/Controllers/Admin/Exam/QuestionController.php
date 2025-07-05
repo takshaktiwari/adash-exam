@@ -28,6 +28,9 @@ class QuestionController extends Controller
             ->when($request->get('question_id'), function ($query) use ($request) {
                 $query->where('question_id', $request->get('question_id'));
             })
+            ->when(!$request->get('question_id'), function ($query) use ($request) {
+                $query->parent();
+            })
             ->when($request->get('question'), function ($query) {
                 $query->where('question', 'like', "%" . request('question') . "%");
             })
@@ -53,11 +56,16 @@ class QuestionController extends Controller
 
     public function create()
     {
-        $questions = Question::select('id', 'question')->get();
+        $questions = Question::select('id', 'question')->parent()->get();
         $questionGroups = QuestionGroup::get();
+        $parentQuestion = null;
+        if(request('question_id')){
+            $parentQuestion = Question::with('questionGroups')->find(request('question_id'));
+        }
         return View::first(['admin.exam.questions.create', 'exam::admin.exam.questions.create'])->with([
             'questionGroups'    =>  $questionGroups,
-            'questions'    =>  $questions
+            'questions'    =>  $questions,
+            'parentQuestion'    =>  $parentQuestion
         ]);
     }
 
@@ -77,6 +85,7 @@ class QuestionController extends Controller
         $ques = new Question();
         $ques->question_id = $request->post('question_id');
         $ques->question = $request->post('question');
+        $ques->context = $request->post('context');
         $ques->answer   = $request->post('answer');
         $ques->marks    = $request->post('marks');
 
@@ -118,7 +127,7 @@ class QuestionController extends Controller
 
         $ques->questionGroups()->sync($request->question_group_id);
 
-        return redirect()->back()->withErrors('CREATED !! New question is created');
+        return to_route('admin.exam.questions.create')->withErrors('CREATED !! New question is created');
     }
 
     public function show(Question $question)
@@ -157,6 +166,7 @@ class QuestionController extends Controller
 
         $question->question_id = $request->post('question_id');
         $question->question = $request->post('question');
+        $question->context = $request->post('context');
         $question->answer   = $request->post('answer');
         $question->marks    = $request->post('marks');
 
@@ -302,6 +312,7 @@ class QuestionController extends Controller
             ->when($questionIds, function ($query) use ($questionIds) {
                 $query->orderByRaw("FIELD(questions.id, " . $questionIds . ") DESC");
             })
+            ->parent()
             ->latest()
             ->paginate(200)
             ->withQueryString();
@@ -435,5 +446,10 @@ class QuestionController extends Controller
             'question' =>  $question,
             'questionGroups' =>  $questionGroups,
         ]);
+    }
+
+    public function ajaxShow(Question $question)
+    {
+        return $question->load('questionGroups');
     }
 }

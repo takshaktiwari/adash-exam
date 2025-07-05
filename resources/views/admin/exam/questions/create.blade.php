@@ -57,12 +57,25 @@
                 <select name="question_id" id="question_id" class="form-control select2">
                     <option value="">-- Select --</option>
                     @foreach ($questions as $question)
-                        <option value="{{ $question->id }}">
+                        <option value="{{ $question->id }}" @selected($parentQuestion?->id == $question->id)>
                             {{ strip_tags($question->question) }}
                         </option>
                     @endforeach
                 </select>
             </div>
+
+            @if (!$parentQuestion)
+                <div class="text-end">
+                    <a href="javascript:void(0)" id="add_context" class="text-primary fs-6" data-bs-toggle="collapse" data-bs-target="#context_block">
+                        <i class="fas fa-plus"></i> Add Context / Passage
+                    </a>
+                </div>
+                <div id="context_block" class="form-group collapse">
+                    <label for="">Context / Passage </label>
+                    <textarea name="context" rows="2" class="form-control text-editor" placeholder="Write your context">{{ old('context') }}</textarea>
+                </div>
+            @endif
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -84,7 +97,7 @@
                     required>
                     <option value="">-- Select --</option>
                     @foreach ($questionGroups as $group)
-                        <option value="{{ $group->id }}">
+                        <option value="{{ $group->id }}" @selected($parentQuestion?->questionGroups->pluck('id')->contains($group->id))>
                             {{ $group->name }}
                         </option>
                     @endforeach
@@ -153,6 +166,13 @@
                     height: 200
                 });
 
+                $("#question_id").on('change', function() {
+                    var questionId = $(this).val();
+                    if (questionId) {
+                        window.location.href = window.location.href + `?question_id=${questionId}`;
+                    }
+                });
+
                 $("#question_submit_btn").click(function() {
                     var correctAnsVal = $('input[name="correct_ans"]:checked').val();
                     if (!correctAnsVal) {
@@ -193,7 +213,7 @@
                 });
 
                 $('#question_options').on('click', '.remove_option', function() {
-                    $(this).parent().parent().remove();
+                    $(this).parent().remove();
                 });
             });
         </script>

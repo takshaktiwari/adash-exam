@@ -58,7 +58,13 @@
                 <div class="card-body">
                     <ul>
                         <li>
+                            <b>Parent Question ID: </b> Enter the ID of the question on which the current question is based on.
+                        </li>
+                        <li>
                             <b>Question: </b> Write your full question here.
+                        </li>
+                        <li>
+                            <b>Context: </b> Context / Passage of the question, If context is added to parent question then this field will be ignored.
                         </li>
                         <li>
                             <b>Answer: </b> Write you correct full descriptive answer.

@@ -50,6 +50,10 @@
             overflow-y: scroll;
         }
 
+        #question_area .context *:last-child {
+            margin-bottom: 0px;
+        }
+
         #question_area .question {
             font-size: 1.1rem;
         }
@@ -121,15 +125,21 @@
             @csrf
             <div id="question_area" class="flex-fill px-4 pt-4">
                 <div class="question">
-                    <div class="d-flex gap-2 mb-4">
+                    <div class="d-flex gap-2 mb-2">
                         <b>{{ $questionKey + 1 }}.</b>
                         <div>
                             {!! nl2br($question->question) !!}
                         </div>
                     </div>
+                    @if ($question->context || $question?->parent?->context)
+                        <div class="alert alert-info context mb-2 small py-2 px-3">
+                            <p class="mb-1 fw-bold">Context:</p>
+                            {!! $question->context ?? $question?->parent?->context !!}
+                        </div>
+                    @endif
                     @if ($question->image)
                         <a hx-boost="false" href="{{ storage($question->image) }}" data-fancybox>
-                            <img src="{{ storage($question->image) }}" alt="question img" class="rounded-2"
+                            <img src="{{ storage($question->image) }}" alt="question img" class="rounded-2 mt-2"
                                 style="max-height: 200px">
                         </a>
                     @endif

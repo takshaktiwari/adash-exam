@@ -52,10 +52,14 @@ class QuestionsImport implements ToModel, WithBatchInserts, WithHeadingRow, With
         if(isset($this->row['parent'])){
             $parent_id = $this->row['parent'];
         }
+        if(isset($this->row['parent_question_id'])){
+            $parent_id = $this->row['parent_question_id'];
+        }
 
         $object = [
             'question_id'   => $parent_id,
             'question'      => $this->row['question'],
+            'context'       => $this->row['context'] ?? '',
             'answer'        => $this->row['answer'],
             'marks'         => $this->row['marks'],
         ];
