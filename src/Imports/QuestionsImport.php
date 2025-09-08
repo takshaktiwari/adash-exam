@@ -19,11 +19,14 @@ class QuestionsImport implements ToModel, WithBatchInserts, WithHeadingRow, With
      */
     public $row;
     public $rowsCount = 0;
+    public $uidQuestions = [];
 
     public function model(array $row)
     {
         $this->row = $row;
+        $this->row = array_map('trim', $this->row);
         $this->rowsCount++;
+
         if ($this->rowsCount > 250) {
             abort(403, 'Cannot upload more than 250 questions at a time');
         }
@@ -37,23 +40,14 @@ class QuestionsImport implements ToModel, WithBatchInserts, WithHeadingRow, With
             return null;
         }
 
-        if(!empty($this->row['id'])) {
-            $question = Question::where('id', $this->row['id'])->first();
-        }
 
-        if(empty($question)) {
+        if (empty($question)) {
             $question = Question::where('question', $this->row['question'])->first();
         }
 
         $parent_id = null;
-        if(isset($this->row['parent_id'])){
-            $parent_id = $this->row['parent_id'];
-        }
-        if(isset($this->row['parent'])){
-            $parent_id = $this->row['parent'];
-        }
-        if(isset($this->row['parent_question_id'])){
-            $parent_id = $this->row['parent_question_id'];
+        if (!empty($this->row['uid']) && empty($this->row['context'])) {
+            $parent_id = $this->uidQuestions[$this->row['uid']];
         }
 
         $object = [
@@ -68,6 +62,10 @@ class QuestionsImport implements ToModel, WithBatchInserts, WithHeadingRow, With
             $question->update($object);
         } else {
             $question = Question::create($object);
+        }
+
+        if (!empty($this->row['uid']) && !empty($this->row['context'])) {
+            $this->uidQuestions[$this->row['uid']] = $question->id;
         }
 
         $groups = explode('|', $this->row['groups']);

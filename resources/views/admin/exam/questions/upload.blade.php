@@ -58,7 +58,7 @@
                 <div class="card-body">
                     <ul>
                         <li>
-                            <b>Parent Question ID: </b> Enter the ID of the question on which the current question is based on.
+                            <b>UID: </b> UID is for grouping multiple questions together. If UID is not given then question will be added as parent question. If questions has same UID then first question will be parent question and other questions will be child questions. <em>(Only applied for passage / context question)</em>
                         </li>
                         <li>
                             <b>Question: </b> Write your full question here.
