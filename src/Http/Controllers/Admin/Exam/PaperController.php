@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Takshak\Exam\Models\Paper;
 use Illuminate\Support\Facades\View;
+use Takshak\Exam\Models\Question;
 use Takshak\Exam\Models\QuestionGroup;
 
 class PaperController extends Controller
@@ -140,6 +141,51 @@ class PaperController extends Controller
             'questions' =>  'required|array'
         ]);
         $paper->questions()->sync($request->questions);
+        cache()->forget('paper_' . $paper->id);
+        return back();
+    }
+
+    public function questionsAutoAdd(Request $request, Paper $paper)
+    {
+        $paper->load('questions:id');
+        $questionIds = $paper->questions->pluck('id');
+
+        $questions = Question::query()
+            ->with('children')
+            ->with('papers:id,title')
+            ->with('questionGroups:id,name')
+            ->when($request->get('search'), function ($query) use ($request) {
+                $query->where(function ($query) use ($request) {
+                    $query->where('question', 'LIKE', '%' . $request->search . '%');
+                    $query->orWhereHas('parent', function ($query) use ($request) {
+                        $query->where('question', 'LIKE', '%' . $request->search . '%');
+                    });
+                });
+            })
+            ->when($request->get('question_group_id'), function ($query) {
+                $query->whereHas('questionGroups', function ($query) {
+                    $query->where('question_groups.id', request('question_group_id'));
+                });
+            })
+            ->when(request('not_used'), function ($query) use ($questionIds) {
+                $query->doesntHave('papers');
+            })
+            ->parent()
+            ->limit($request->get('auto_add_questions', 10))
+            ->get()
+            ->each(function ($question) use (&$questionIds) {
+                $questionIds->push($question->id);
+                if ($question->children) {
+                    foreach ($question->children as $child) {
+                        $questionIds->push($child->id);
+                    }
+                }
+            });
+
+        $questions = Question::whereIn('id', $questionIds)->get();
+        $questionIds = $questions->pluck('id')->toArray();
+
+        $paper->questions()->sync($questionIds);
         cache()->forget('paper_' . $paper->id);
         return back();
     }

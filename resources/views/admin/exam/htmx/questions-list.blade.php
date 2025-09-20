@@ -27,10 +27,12 @@
             @endforeach
             @if ($question->papers->count())
                 <div class="small fw-light text-info mt-1">
-                    <b>Existing Papers: </b>
+                    <b>Added in: </b>
                     @foreach ($question->papers->pluck('title') as $title)
                         <em>{{ $title }}</em>
-                        <span class="px-1 text-dark">|</span>
+                        @if (!$loop->last)
+                            <span class="px-1 text-dark">|</span>
+                        @endif
                     @endforeach
                 </div>
             @endif

@@ -59,7 +59,7 @@ class QuestionController extends Controller
         $questions = Question::select('id', 'question')->parent()->get();
         $questionGroups = QuestionGroup::get();
         $parentQuestion = null;
-        if(request('question_id')){
+        if (request('question_id')) {
             $parentQuestion = Question::with('questionGroups')->find(request('question_id'));
         }
         return View::first(['admin.exam.questions.create', 'exam::admin.exam.questions.create'])->with([
@@ -311,6 +311,9 @@ class QuestionController extends Controller
             })
             ->when($questionIds, function ($query) use ($questionIds) {
                 $query->orderByRaw("FIELD(questions.id, " . $questionIds . ") DESC");
+            })
+            ->when(request('not_used'), function ($query) use ($questionIds) {
+                $query->doesntHave('papers');
             })
             ->parent()
             ->latest()

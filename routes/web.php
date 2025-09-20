@@ -28,8 +28,11 @@ Route::middleware('web')->group(function () {
             Route::resource('question-groups', QuestionGroupController::class);
 
             Route::prefix('papers/{paper}')->name('papers.')->group(function () {
-                Route::get('questions/edit', [PaperController::class, 'questionsEdit'])->name('questions.edit');
-                Route::post('questions/update', [PaperController::class, 'questionsUpdate'])->name('questions.update');
+                Route::controller(PaperController::class)->group(function () {
+                    Route::get('questions/edit', 'questionsEdit')->name('questions.edit');
+                    Route::post('questions/update', 'questionsUpdate')->name('questions.update');
+                    Route::post('questions/auto-add', 'questionsAutoAdd')->name('questions.auto-add');
+                });
                 Route::resource('sections', PaperSectionController::class);
             });
             Route::resource('papers', PaperController::class);

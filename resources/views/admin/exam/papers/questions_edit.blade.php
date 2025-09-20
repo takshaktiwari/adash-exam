@@ -27,8 +27,8 @@
                 <span id="questions_count">{{ $paper->questions_count }}</span>
             </p>
         </div>
-        <div class="card-header">
-            <div class="d-flex">
+        <form method="POST" action="{{ route('admin.exam.papers.questions.auto-add', [$paper]) }}" class="card-header">
+            <div class="d-flex gap-2">
                 <div style="width: 350px">
                     <label for="">Question Group</label>
                     <select name="question_group_id" id="question_group_id" class="form-control"
@@ -48,7 +48,31 @@
                         placeholder="Search question"
                         hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
                         hx-include="#question_group_id" hx-trigger="change, load" hx-target="#questions">
-
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-2">
+                <div class="form-check pt-2">
+                    <label class="form-check-label mb-0">
+                        <input class="form-check-input" type="checkbox" id="not_used" name="not_used" value="1"
+                            hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
+                            hx-include="#question_group_id, #question_search" hx-trigger="change"
+                            hx-target="#questions">
+                        <span class="text-nowrap">Not Used In Papers</span>
+                    </label>
+                </div>
+            </div>
+            <hr />
+            <div class="d-flex gap-3 mt-2">
+                <div class="my-auto">
+                    <div class="input-group">
+                        <span class="input-group-text">Auto Add Ques.</span>
+                        <input type="number" name="auto_add_questions" id="auto_add" class="form-control" placeholder="eg. 25" style="max-width: 80px;" required>
+                    </div>
+                </div>
+                <div class="my-auto">
+                    <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure to auto add questions?')">
+                        <i class="fas fa-save"></i> Add Questions
+                    </button>
                 </div>
             </div>
             <div class="text-end">
