@@ -67,98 +67,12 @@
 
     <div class="card shadow-sm">
         <div class="card-body table-responsive">
-            <table class="table">
-                <thead>
-                    <th>
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input check_all_question_ids" type="checkbox">
-                                #
-                            </label>
-                        </div>
-                    </th>
-                    <th>Paper</th>
-                    <th>User</th>
-                    <th>Questions</th>
-                    <th>Stared At</th>
-                    <th>Marks</th>
-                    <th>Action</th>
-                </thead>
-                <tbody>
-                    @foreach ($userPapers as $key => $userPaper)
-                        <tr>
-                            <td>
-                                <div class="form-check">
-                                    <label class="form-check-label">
-                                        <input class="form-check-input question_ids" type="checkbox" value="{{ $userPaper->id }}">
-                                        {{ $userPapers->firstItem() + $key }}
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="small">
-                                <a href="{{ route('admin.exam.papers.show', [$userPaper->paper]) }}">
-                                    {{ $userPaper->paper->title }}
-                                </a>
-                            </td>
-                            <td>
-                                <a href="{{ route('admin.users.show', [$userPaper->user]) }}">
-                                    {{ $userPaper->user->name }}
-                                </a>
-                            </td>
-                            <td class="text-nowrap">
-                                Total: {{ $userPaper->paper->questions_count }}
-                                <span class="px-2 text-dark">|</span>
-                                Answered: {{ $userPaper->questions->where('status', 'answered')->count() }}
-                            </td>
-                            <td class="text-nowrap">{{ $userPaper->start_at?->format('d-M-Y h:i A') }}</td>
-                            <td>{{ $userPaper->questions->where('status', 'answered')->sum('marks') }}</td>
-                            <td class="text-nowrap">
-                                <a href="{{ route('admin.exam.user-papers.show', [$userPaper]) }}"
-                                    class="btn btn-sm btn-info load-circle">
-                                    <i class="fas fa-info-circle"></i>
-                                </a>
-                                <a href="{{ route('admin.exam.user-papers.delete', [$userPaper]) }}"
-                                    class="btn btn-sm btn-danger load-circle">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        <div class="card-footer d-flex flex-wrap justify-content-between">
-            {{ $userPapers->links() }}
-
-            <div class="actions">
-                <button class="btn btn-danger px-3 delete_questions_btn">
-                    <i class="fas fa-trash"></i> Delete Checked
-                </button>
-            </div>
+            {{ $dataTable->table() }}
         </div>
     </div>
 
     @push('scripts')
-        <script>
-            $(document).ready(function() {
-                $(".check_all_question_ids").click(function() {
-                    $('.question_ids').not(this).prop('checked', this.checked);
-                });
-
-                $(".delete_questions_btn").click(function() {
-                    var userPaperIds = $(".question_ids:checked").map(function() {
-                        return $(this).val();
-                    }).get();
-
-                    if(!userPaperIds.length){
-                        alert('Please select user papers.');
-                        return false;
-                    }
-
-                    window.location.href = "{{ route('admin.exam.user-papers.bulk-delete') }}?user_paper_ids="+encodeURIComponent(userPaperIds);
-                });
-            });
-        </script>
+        {{ $dataTable->scripts(attributes: ['type' => 'module']) }}
     @endpush
 
 </x-admin.layout>

@@ -1,9 +1,10 @@
 @php
-
+    $isCorrect = false;
     $badgeClass = 'bg-secondary';
     if (!$question->userQuestion || $question->userQuestion?->status == 'marked') {
         $badgeClass = 'bg-secondary';
     } elseif ($question->userQuestion->correct_option_id == $question->userQuestion->user_option_id) {
+        $isCorrect = true;
         $badgeClass = 'bg-success';
     } else {
         $badgeClass = 'bg-danger';
@@ -26,27 +27,46 @@
             Marks: {{ $question->userQuestion ? $question->userQuestion->marks : 0 }}
         </div>
     </div>
-    <div class="card-body border-bottom">
+    <div class="card-body border-bottom py-3">
         {!! nl2br($question->question) !!}
     </div>
-    <div class="card-body">
+    <div class="card-body border-bottom py-2">
+        @foreach ($question->options as $option)
+            <div class="d-flex gap-3 mb-2">
+                <div class="icon">
+                    @if ($option->correct_ans)
+                        <i class="fas fa-check-square"></i>
+                    @else
+                        <i class="far fa-square"></i>
+                    @endif
+                </div>
+                <div @class([
+                    'text-dark' => $option->correct_ans,
+                    'text-gray' => !$option->correct_ans,
+                ])>
+                    {{ $option->option_text }}
+                </div>
+            </div>
+        @endforeach
+
         @if ($question->userQuestion && $question->userQuestion->status == 'answered')
-            <div>
+            <div @class(['mt-3', 'text-success' => $isCorrect, 'text-danger' => !$isCorrect]) style="font-size: 110%; font-weight: 500;">
                 <b>User Answer: </b>
                 {{ $question->userQuestion->user_answer_text }}
             </div>
         @endif
-        <div class="mb-2">
-            <b>Correct Answer: </b>
-            {{ $question->userQuestion?->correct_answer_text
-                ? $question->userQuestion->correct_answer_text
-                : $question->correctOption->option_text }}
-        </div>
-        @if ($question->answer)
-            <div>
-                <b>Explanation: </b>
-                {{ $question->answer }}
-            </div>
-        @endif
     </div>
+    @if ($question->answer)
+        <div class="card-body py-3">
+            <b>Explanation: </b>
+            {{ $question->answer }}
+        </div>
+    @endif
 </div>
+@push('styles')
+    <style>
+        .text-gray {
+            color: gray;
+        }
+    </style>
+@endpush

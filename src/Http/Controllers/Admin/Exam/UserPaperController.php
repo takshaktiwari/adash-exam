@@ -2,6 +2,7 @@
 
 namespace Takshak\Exam\Http\Controllers\Admin\Exam;
 
+use Takshak\Exam\DataTables\UserPapersDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ use Takshak\Exam\Models\UserPaper;
 
 class UserPaperController extends Controller
 {
-    public function index(Request $request)
+    public function index(UserPapersDataTable $dataTable, Request $request)
     {
         $papers = collect();
         $users = collect();
@@ -20,28 +21,16 @@ class UserPaperController extends Controller
             $users = User::select('id', 'name')->get();
         }
 
-        $userPapers = UserPaper::query()
-            ->with(['paper' => function ($query) {
-                $query->withCount('questions');
-            }])
-            ->with('questions:id,user_paper_id,status,marks')
-            ->when($request->get('paper_id'), function ($query) use ($request) {
-                $query->where('paper_id', $request->get('paper_id'));
-            })
-            ->when($request->get('user_id'), function ($query) use ($request) {
-                $query->where('user_id', $request->get('user_id'));
-            })
-            ->when($request->get('started_on'), function ($query) use ($request) {
-                $query->whereDate('start_at', $request->get('started_on'));
-            })
-            ->latest()
-            ->paginate(50);
-
-        return View::first(['admin.exam.user-papers.index', 'exam::admin.exam.user-papers.index'])->with([
-            'userPapers' =>  $userPapers,
-            'papers' =>  $papers,
-            'users' =>  $users,
-        ]);
+        return $dataTable->render(
+            View::first([
+                'admin.exam.user-papers.index',
+                'exam::admin.exam.user-papers.index'
+            ])->name(),
+            [
+                'papers' =>  $papers,
+                'users' =>  $users,
+            ]
+        );
     }
 
     public function show(UserPaper $userPaper)
@@ -75,12 +64,11 @@ class UserPaperController extends Controller
     public function bulkDelete(Request $request)
     {
         $request->validate([
-            'user_paper_ids' => 'required'
+            'item_ids' => 'required|array'
         ]);
 
-        $user_paper_ids = explode(',', $request->user_paper_ids);
-        if (count($user_paper_ids)) {
-            UserPaper::whereIn('id', $user_paper_ids)->delete();
+        if (count($request->item_ids)) {
+            UserPaper::whereIn('id', $request->item_ids)->delete();
         }
 
         return redirect()->route('admin.exam.user-papers.index')->withSuccess('SUCCESS !! Selected questions are successfully deleted');

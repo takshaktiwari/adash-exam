@@ -7,7 +7,7 @@
                     <h5 class="my-1">Question Paper</h5>
                 </div>
                 <div class="card-body">
-                    <table class="table">
+                    <table class="table table-sm mb-0">
                         <tr>
                             <th colspan="2">{{ $paper->title }}</th>
                         </tr>
@@ -33,7 +33,7 @@
                     <h5 class="my-1">Exam Report</h5>
                 </div>
                 <div class="card-body">
-                    <table class="table">
+                    <table class="table table-sm mb-0">
                         <tr>
                             <th>Answered</th>
                             <td>{{ $userPaper->questions->where('status', 'answered')->count() }} Questions</td>
