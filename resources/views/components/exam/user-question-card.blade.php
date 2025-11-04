@@ -27,7 +27,7 @@
             Marks: {{ $question->userQuestion ? $question->userQuestion->marks : 0 }}
         </div>
     </div>
-    <div class="card-body border-bottom py-3">
+    <div class="card-body border-bottom py-3" style="font-size: 110%; font-weight: 500;">
         {!! nl2br($question->question) !!}
     </div>
     <div class="card-body border-bottom py-2">
