@@ -23,7 +23,7 @@
                 @endif
             </span>
         </div>
-        <div>
+        <div class="my-auto">
             Marks: {{ $question->userQuestion ? $question->userQuestion->marks : 0 }}
         </div>
     </div>
@@ -54,7 +54,14 @@
                 <b>User Answer: </b>
                 {{ $question->userQuestion->user_answer_text }}
             </div>
+            @else
+            <div class="mt-2"></div>
         @endif
+
+        <div class="mt-1 text-dark" style="font-size: 110%; font-weight: 500;">
+            <b>Correct Answer:</b>
+            {{ $question->options->filter(fn ($option) => $option->correct_ans)->first()?->option_text ?? 'N/A' }}
+        </div>
     </div>
     @if ($question->answer)
         <div class="card-body py-3">
