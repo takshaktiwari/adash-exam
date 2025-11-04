@@ -23,6 +23,10 @@
                             <th>Total Marks</th>
                             <td>{{ $paper->questions_sum_marks }}</td>
                         </tr>
+                        <tr>
+                            <th>Marks Obtained</th>
+                            <td>{{ $userPaper->questions_sum_marks }}</td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -44,12 +48,18 @@
                         </tr>
                         <tr>
                             <th>Not Answered</th>
-                            <td>{{ $paper->questions_count - $userPaper->questions->where('status', 'answered')->count() }}
-                                Questions</td>
+                            <td>
+                                {{ $paper->questions_count - $userPaper->questions->where('status', 'answered')->count() }}
+                                Questions
+                            </td>
                         </tr>
                         <tr>
-                            <th>Marks Obtained</th>
-                            <td>{{ $userPaper->questions_sum_marks }}</td>
+                            <th>Correct</th>
+                            <td>{{ $userPaper->questions->filter(fn($i) => $i->isCorrect)->count() }}</td>
+                        </tr>
+                        <tr>
+                            <th>Incorrect</th>
+                            <td>{{ $userPaper->questions->filter(fn($i) => !$i->isCorrect)->count() }}</td>
                         </tr>
                     </table>
                 </div>
