@@ -42,6 +42,7 @@ Route::middleware('web')->group(function () {
                 Route::get('bulk-delete', [ExamUserPaperController::class, 'bulkDelete'])->name('bulk-delete');
                 Route::get('{userPaper}', [ExamUserPaperController::class, 'show'])->name('show');
                 Route::get('delete/{userPaper}', [ExamUserPaperController::class, 'destroy'])->name('delete');
+                Route::delete('delete/{userPaper}', [ExamUserPaperController::class, 'destroy'])->name('delete');
             });
 
             Route::prefix('htmx')->name('htmx.')->group(function () {
