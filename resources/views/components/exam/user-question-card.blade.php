@@ -28,6 +28,12 @@
         </div>
     </div>
     <div class="card-body border-bottom py-3" style="font-size: 110%; font-weight: 500;">
+        @if ($question->context || $question?->parent?->context)
+            <div class="alert alert-info context mb-2 small py-2 px-3">
+                <p class="mb-1 fw-bold">Context:</p>
+                {!! $question->context ?? $question?->parent?->context !!}
+            </div>
+        @endif
         {!! nl2br($question->question) !!}
     </div>
     <div class="card-body border-bottom py-2">
