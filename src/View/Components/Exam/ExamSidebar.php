@@ -24,7 +24,11 @@ class ExamSidebar extends Component
         $this->markedCount = $this->userQuestions->where('status', 'marked')->count();
         $this->forReviewCount = $this->userQuestions->where('status', 'mark_review')->count();
 
-        if($this->paper?->sections?->count()) {
+        $sestionsCount = isset($this->paper->sections_count)
+            ? $this->paper->sections_count
+            : $this->paper?->sections?->count();
+
+        if($sestionsCount) {
             $this->sections = $this->paper->sections->map(function ($section) {
                 $questions = [];
                 foreach ($section->questions as $question) {
