@@ -267,7 +267,7 @@ class ExamController extends Controller
             }
         );
 
-        if ($paper?->sections?->count() && session('exam.paper.lock_sections')) {
+        if ($paper?->sections_count && session('exam.paper.lock_sections')) {
             # checking if the current question is in the current section's questions list
             # if not then redirect to last question of current section
             $section = PaperSection::where('id', session('exam.current_section'))
@@ -287,7 +287,7 @@ class ExamController extends Controller
                 }
             }
 
-            if(!in_array($question_id, $sectionQuestions)){
+            if (!in_array($question_id, $sectionQuestions)) {
                 return redirect()->route('exam.paper', [$paper, 'question_id' => end($sectionQuestions)]);
             }
         }
@@ -306,18 +306,14 @@ class ExamController extends Controller
             }
         );
 
-        $userQuestion = UserQuestion::query()
-            ->where('user_paper_id', $userPaper->id)
-            ->where('user_id', auth()->id())
-            ->where('paper_id', $paper->id)
-            ->where('question_id', $question->id)
-            ->first();
-
         $userQuestions = UserQuestion::query()
+            ->select('id', 'user_paper_id', 'user_id', 'paper_id', 'question_id', 'user_option_id', 'status')
             ->where('user_paper_id', $userPaper->id)
             ->where('user_id', auth()->id())
             ->where('paper_id', $paper->id)
             ->get();
+
+        $userQuestion = $userQuestions->where('question_id', $question->id)->first();
 
         return View::first(['exam.paper', 'exam::exam.paper'])->with([
             'paper' =>  $paper,
@@ -364,8 +360,17 @@ class ExamController extends Controller
             'next_question_id' => 'nullable|numeric'
         ]);
 
-        $question->load('options');
-        $correctOption = $question->options->where('correct_ans', true)->first();
+        if (!$question->relationLoaded('options')) {
+            $question->with('options');
+        }
+
+        $correctOption = $question->options
+            ->where('correct_ans', true)
+            ->first();
+
+        $userOption = $question->options
+            ->where('id', $request->user_option)
+            ->first();
 
         UserQuestion::updateOrCreate(
             [
@@ -378,7 +383,7 @@ class ExamController extends Controller
                 'user_option_id' => $request->user_option,
                 'correct_option_id' => $correctOption?->id,
                 'status' => $request->input('mark_review') ? 'mark_review' : 'answered',
-                'user_answer_text' => QuestionOption::find($request->user_option)?->option_text,
+                'user_answer_text' => $userOption?->option_text,
                 'correct_answer_text' => $correctOption?->option_text,
                 'marks' => $question->marks
             ]
