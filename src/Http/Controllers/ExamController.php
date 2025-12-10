@@ -37,7 +37,7 @@ class ExamController extends Controller
             return redirect()->route('exam.papers')->withErrors('SORRY !! Security code is not correct. Please try again.');
         }
 
-        $arr = session('exam', []);
+        $arr = session('exam.paper.id') == $paper->id ? session('exam', []) : [];
         $arr['authenticated'] = true;
         session(['exam' => $arr]);
         return redirect()->route('exam.instructions', [$paper]);
