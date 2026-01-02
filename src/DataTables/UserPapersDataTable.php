@@ -95,6 +95,7 @@ class UserPapersDataTable extends DataTable
             ->serverSide(true) // Enable server-side processing
             ->processing(true)
             ->stateSave(true)
+            ->orders([6, 'desc'])
             ->buttons([
                 // Button::make('excel'),
                 Button::make('csv'),
