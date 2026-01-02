@@ -17,7 +17,7 @@ class PaperController extends Controller
             ->withCount('sections')
             ->withCount('questions')
             ->withSum('questions', 'marks')
-            ->orderBy('id', 'ASC')
+            ->orderBy('id', 'DESC')
             ->paginate(50);
 
         return View::first(['admin.exam.papers.index', 'exam::admin.exam.papers.index'])
