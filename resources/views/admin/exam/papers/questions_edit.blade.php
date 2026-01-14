@@ -66,11 +66,13 @@
                 <div class="my-auto">
                     <div class="input-group">
                         <span class="input-group-text">Auto Add Ques.</span>
-                        <input type="number" name="auto_add_questions" id="auto_add" class="form-control" placeholder="eg. 25" style="max-width: 80px;" required>
+                        <input type="number" name="auto_add_questions" id="auto_add" class="form-control"
+                            placeholder="eg. 25" style="max-width: 80px;" required>
                     </div>
                 </div>
                 <div class="my-auto">
-                    <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure to auto add questions?')">
+                    <button type="submit" class="btn btn-primary"
+                        onclick="return confirm('Are you sure to auto add questions?')">
                         <i class="fas fa-save"></i> Add Questions
                     </button>
                 </div>
@@ -78,7 +80,7 @@
             <div class="text-end">
                 <a href="{{ url()->current() }}" class="text-danger"><i class="fas fa-times"></i> Reset</a>
             </div>
-        </div>
+    </div>
     </div>
 
     <form method="POST" action="{{ route('admin.exam.papers.questions.update', [$paper]) }}" class="card shadow-sm">

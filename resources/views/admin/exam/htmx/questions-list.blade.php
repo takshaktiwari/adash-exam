@@ -19,23 +19,38 @@
             </p>
         </label>
         <div class="ms-4">
-            @foreach ($question->questionGroups as $group)
-                <a href="{{ route('admin.exam.questions.index', ['question_group_id' => $group->id]) }}"
-                    class="badge bg-info">
-                    {{ $group->name }}
-                </a>
-            @endforeach
-            @if ($question->papers->count())
-                <div class="small fw-light text-info mt-1">
-                    <b>Added in: </b>
-                    @foreach ($question->papers->pluck('title') as $title)
-                        <em>{{ $title }}</em>
-                        @if (!$loop->last)
-                            <span class="px-1 text-dark">|</span>
-                        @endif
-                    @endforeach
+            <div class="d-flex gap-2 mt-1 flex-wrap">
+                <div class="my-auto">
+                    <a href="{{ route('admin.exam.questions.edit', [
+                        $question,
+                        'refer' => [
+                            'refer_from' => route('admin.exam.questions.edit', [$question]),
+                            'refer_to' => route('admin.exam.papers.questions.edit', [$model]),
+                            'method' => 'GET'
+                        ]
+                    ]) }}"
+                        class="text-success fw-bold">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
                 </div>
-            @endif
+                @foreach ($question->questionGroups as $group)
+                    <a href="{{ route('admin.exam.questions.index', ['question_group_id' => $group->id]) }}"
+                        class="badge bg-info">
+                        {{ $group->name }}
+                    </a>
+                @endforeach
+                @if ($question->papers->count())
+                    <div class="small fw-light text-info my-auto">
+                        <b>Added in: </b>
+                        @foreach ($question->papers->pluck('title') as $title)
+                            <em>{{ $title }}</em>
+                            @if (!$loop->last)
+                                <span class="px-1 text-dark">|</span>
+                            @endif
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 @endforeach

@@ -2,6 +2,7 @@
 
 use Takshak\Adash\Http\Middleware\GatesMiddleware;
 use Illuminate\Support\Facades\Route;
+use Takshak\Adash\Http\Middleware\ReferrerMiddleware;
 use Takshak\Exam\Http\Controllers\Admin\Exam\PaperController;
 use Takshak\Exam\Http\Controllers\Admin\Exam\PaperSectionController;
 use Takshak\Exam\Http\Controllers\Admin\Exam\QuestionController;
@@ -11,7 +12,7 @@ use Takshak\Exam\Http\Controllers\ExamController;
 use Takshak\Exam\Http\Controllers\UserPaperController;
 
 Route::middleware('web')->group(function () {
-    Route::middleware(['auth', GatesMiddleware::class])
+    Route::middleware(['auth', GatesMiddleware::class, ReferrerMiddleware::class])
         ->prefix('admin/exam')
         ->name('admin.exam.')
         ->group(function () {
