@@ -33,7 +33,7 @@
                     <label for="">Question Group</label>
                     <select name="question_group_id" id="question_group_id" class="form-control"
                         hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
-                        hx-include="#question_search" hx-trigger="change" hx-target="#questions">
+                        hx-include="#question_search, #not_used, #show_options" hx-trigger="change" hx-target="#questions">
                         <option value="">-- Question group --</option>
                         @foreach ($questionGroups as $group)
                             <option value="{{ $group->id }}">
@@ -47,17 +47,27 @@
                     <input type="text" name="search" id="question_search" class="form-control"
                         placeholder="Search question"
                         hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
-                        hx-include="#question_group_id" hx-trigger="change, load" hx-target="#questions">
+                        hx-include="#question_group_id, #not_used, #show_options" hx-trigger="change, load" hx-target="#questions">
                 </div>
             </div>
-            <div class="d-flex gap-2 mt-2">
+            <div class="d-flex gap-3 mt-2">
                 <div class="form-check pt-2">
                     <label class="form-check-label mb-0">
                         <input class="form-check-input" type="checkbox" id="not_used" name="not_used" value="1"
                             hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
-                            hx-include="#question_group_id, #question_search" hx-trigger="change"
+                            hx-include="#question_group_id, #question_search, #show_options" hx-trigger="change"
                             hx-target="#questions">
                         <span class="text-nowrap">Not Used In Papers</span>
+                    </label>
+                </div>
+
+                <div class="form-check pt-2">
+                    <label class="form-check-label mb-0">
+                        <input class="form-check-input" type="checkbox" id="show_options" name="show_options" value="1"
+                            hx-get="{{ route('admin.exam.htmx.questions.list', ['paper_id' => $paper->id]) }}"
+                            hx-include="#question_group_id, #question_search, #not_used" hx-trigger="change"
+                            hx-target="#questions">
+                        <span class="text-nowrap">Show Options</span>
                     </label>
                 </div>
             </div>
