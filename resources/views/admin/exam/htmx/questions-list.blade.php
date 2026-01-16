@@ -18,7 +18,22 @@
                 {{ strip_tags($question->question) }}
             </p>
         </label>
-        <div class="ms-4">
+        @if (request('show_options'))
+            <div class="qus_option border-start border-3 ps-2 border-dark my-2" style="margin-left: 2rem;">
+                @foreach ($question->options as $option)
+                    <p class="mb-0">
+                        @if ($option->correct_ans)
+                            <i class="fas fa-check text-success"></i>
+                            <span class="fw-bold">{{ $option->option_text }}</span>
+                        @else
+                            <i class="fas fa-dot-circle text-secondary"></i>
+                            <span>{{ $option->option_text }}</span>
+                        @endif
+                    </p>
+                @endforeach
+            </div>
+        @endif
+        <div class="ms-4 ps-2">
             <div class="d-flex gap-2 mt-1 flex-wrap">
                 <div class="my-auto">
                     <a href="{{ route('admin.exam.questions.edit', [
@@ -26,8 +41,8 @@
                         'refer' => [
                             'refer_from' => route('admin.exam.questions.edit', [$question]),
                             'refer_to' => route('admin.exam.papers.questions.edit', [$model]),
-                            'method' => 'GET'
-                        ]
+                            'method' => 'GET',
+                        ],
                     ]) }}"
                         class="text-success fw-bold">
                         <i class="fas fa-edit"></i> Edit
