@@ -296,6 +296,9 @@ class QuestionController extends Controller
             ->withCount('children')
             ->with('papers:id,title')
             ->with('questionGroups:id,name')
+            ->when(request('show_options'), function($query){
+                $query->with('options:id,question_id,option_text,option_img,correct_ans');
+            })
             ->when($request->get('search'), function ($query) use ($request) {
                 $query->where(function ($query) use ($request) {
                     $query->where('question', 'LIKE', '%' . $request->search . '%');
