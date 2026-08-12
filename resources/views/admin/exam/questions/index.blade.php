@@ -76,6 +76,13 @@
 
     <div class="card shadow-sm">
         <x-admin.paginator-info :items="$questions" class="card-header" />
+        <div class="card-header pt-0">
+            <div class="actions">
+                <button class="btn btn-sm btn-danger px-3 delete_questions_btn">
+                    <i class="fas fa-trash"></i> Delete Checked
+                </button>
+            </div>
+        </div>
         <div class="card-body">
             <table class="table">
                 <thead>
@@ -172,8 +179,7 @@
                                     class="d-inline-block" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button href="" class="btn btn-sm btn-danger" title="Delete Date Slot"
-                                        onclick="return confirm('Are you sure to delete this date')">
+                                    <button href="" class="btn btn-sm btn-danger delete-alert" title="Delete Date Slot">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>

@@ -10,11 +10,25 @@
 
     <div class="card shadow-sm">
         <x-admin.paginator-info :items="$papers" class="card-header" />
+        <div class="card-header pt-0">
+            <div class="actions">
+                <button class="btn btn-sm btn-danger px-3 delete_papers_btn">
+                    <i class="fas fa-trash"></i> Delete Checked
+                </button>
+            </div>
+        </div>
         <div class="card-body table-responsive">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input check_all_paper_ids" type="checkbox">
+                                    #
+                                </label>
+                            </div>
+                        </th>
                         <th>Paper Title</th>
                         <th>Sections</th>
                         <th>Ques</th>
@@ -25,9 +39,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($papers as $paper)
+                    @foreach ($papers as $key => $paper)
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <td>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input paper_ids" type="checkbox"
+                                            value="{{ $paper->id }}">
+                                        {{ $key + 1 }}
+                                    </label>
+                                </div>
+                            </td>
                             <td class="small">
                                 <span class="d-block">
                                     {{ $paper->title }}
@@ -81,10 +103,37 @@
                 </tbody>
             </table>
         </div>
-        <div class="card-footer">
+        <div class="card-footer d-flex flex-wrap justify-content-between">
             {{ $papers->links() }}
+            <div class="actions">
+                <button class="btn btn-danger px-3 delete_papers_btn">
+                    <i class="fas fa-trash"></i> Delete Checked
+                </button>
+            </div>
         </div>
     </div>
 
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                $(".check_all_paper_ids").click(function() {
+                    $('.paper_ids').not(this).prop('checked', this.checked);
+                });
 
+                $(".delete_papers_btn").click(function() {
+                    var paperIds = $(".paper_ids:checked").map(function() {
+                        return $(this).val();
+                    }).get();
+
+                    if (!paperIds.length) {
+                        alert('Please select questions.');
+                        return false;
+                    }
+
+                    window.location.href = "{{ route('admin.exam.papers.bulk-delete') }}?paper_ids=" +
+                        encodeURIComponent(paperIds);
+                });
+            });
+        </script>
+    @endpush
 </x-admin.layout>

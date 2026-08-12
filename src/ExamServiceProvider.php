@@ -2,14 +2,17 @@
 
 namespace Takshak\Exam;
 
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Takshak\Exam\Console\Commands\FinalizeExpiredUserPapersCommand;
+use Takshak\Exam\Console\Commands\PrepareUserPaperReportCommand;
 
 class ExamServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        //$this->commands([InstallCommand::class]);
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'exam');
         $this->loadViewComponentsAs('exam', [
             View\Components\Exam\AdminSidebarLinks::class,
@@ -22,6 +25,11 @@ class ExamServiceProvider extends ServiceProvider
             View\Components\Exam\UserQuestionCard::class,
         ]);
 
+        // Registered with exact tag names (not the `exam::` prefix above) so they can
+        // be dropped into any view, matching how they were used before moving here.
+        Blade::component(View\Components\Exam\UserExamProgress::class, 'user-exam-progress');
+        Blade::component(View\Components\Exam\UserExamRanking::class, 'user-exam-ranking');
+
         if(file_exists(base_path('routes/exam.php'))) {
             $this->loadRoutesFrom(base_path('routes/exam.php'));
         } else {
@@ -29,6 +37,18 @@ class ExamServiceProvider extends ServiceProvider
         }
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                FinalizeExpiredUserPapersCommand::class,
+                PrepareUserPaperReportCommand::class,
+            ]);
+        }
+
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            $schedule->command('exam:finalize-expired-user-papers')->hourly()->withoutOverlapping();
+            $schedule->command('exam:prepare-user-paper-report')->everyThreeHours();
+        });
 
         $this->publishes([
             __DIR__ . '/../routes/web.php' => base_path('routes/exam.php'),

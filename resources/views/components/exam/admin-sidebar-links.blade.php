@@ -39,3 +39,9 @@
         <span>User Exams / Papers</span>
     </a>
 </li>
+<li>
+    <a href="{{ route('admin.exam.user-exam-progress.index') }}" class=" waves-effect">
+        <i class="fas fa-chart-line"></i>
+        <span>User Exam Progress</span>
+    </a>
+</li>

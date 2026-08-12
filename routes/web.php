@@ -7,6 +7,7 @@ use Takshak\Exam\Http\Controllers\Admin\Exam\PaperController;
 use Takshak\Exam\Http\Controllers\Admin\Exam\PaperSectionController;
 use Takshak\Exam\Http\Controllers\Admin\Exam\QuestionController;
 use Takshak\Exam\Http\Controllers\Admin\Exam\QuestionGroupController;
+use Takshak\Exam\Http\Controllers\Admin\Exam\UserExamProgressController;
 use Takshak\Exam\Http\Controllers\Admin\Exam\UserPaperController as ExamUserPaperController;
 use Takshak\Exam\Http\Controllers\ExamController;
 use Takshak\Exam\Http\Controllers\UserPaperController;
@@ -36,6 +37,7 @@ Route::middleware('web')->group(function () {
                 });
                 Route::resource('sections', PaperSectionController::class);
             });
+            Route::get('papers/bulk-delete', [PaperController::class, 'bulkDelete'])->name('papers.bulk-delete');
             Route::resource('papers', PaperController::class);
 
             Route::prefix('user-papers')->name('user-papers.')->group(function () {
@@ -51,6 +53,10 @@ Route::middleware('web')->group(function () {
                 Route::get('questions/list', [QuestionController::class, 'htmxList'])->name('questions.list');
                 Route::get('questions/attach/toggle', [QuestionController::class, 'htmxAttachToggle'])->name('questions.attach.toggle');
                 Route::get('questions/bind/toggle', [QuestionController::class, 'htmxBindToggle'])->name('questions.bind.toggle');
+            });
+
+            Route::prefix('user-exam-progress')->name('user-exam-progress.')->group(function () {
+                Route::get('/', [UserExamProgressController::class, 'index'])->name('index');
             });
         });
 

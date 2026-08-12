@@ -125,6 +125,23 @@ class PaperController extends Controller
         return redirect()->route('admin.exam.papers.index')->withErrors('DELETED !! Paper is successfully deleted');
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'paper_ids' => 'required'
+        ]);
+
+        $paperIds = explode(',', $request->paper_ids);
+        if (count($paperIds)) {
+            foreach ($paperIds as $paperId) {
+                cache()->forget('paper_' . $paperId);
+            }
+            Paper::whereIn('id', $paperIds)->delete();
+        }
+
+        return redirect()->route('admin.exam.papers.index')->withSuccess('SUCCESS !! Selected papers are successfully deleted');
+    }
+
     public function questionsEdit(Paper $paper)
     {
         $paper->loadCount('questions');
