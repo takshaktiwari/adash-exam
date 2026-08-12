@@ -74,6 +74,34 @@
             }
         }
     </script>
+
+    <script>
+        // htmx has no timeout or error UI by default, so a slow or dropped request
+        // (common on mobile switching networks) leaves whichever button was clicked
+        // stuck on "Please wait" forever with no way to recover except a full reload.
+        // This bounds every htmx-boosted exam action with a timeout and restores the
+        // UI instead of leaving it dead when a request fails or times out.
+        htmx.config.timeout = 15000; // 15s — generous for a slow mobile connection, but bounded
+
+        function examRecoverFromFailedRequest(message) {
+            document.querySelectorAll('.action_btn[data-original-html]').forEach(function(el) {
+                el.innerHTML = el.getAttribute('data-original-html');
+                el.removeAttribute('data-original-html');
+                el.classList.remove('disabled');
+            });
+            alert(message);
+        }
+
+        document.body.addEventListener('htmx:timeout', function() {
+            examRecoverFromFailedRequest('That took too long to respond. Please check your connection and try again.');
+        });
+        document.body.addEventListener('htmx:sendError', function() {
+            examRecoverFromFailedRequest('Could not reach the server. Please check your connection and try again.');
+        });
+        document.body.addEventListener('htmx:responseError', function() {
+            examRecoverFromFailedRequest('Something went wrong saving that. Please try again.');
+        });
+    </script>
     @stack('scripts')
 </body>
 

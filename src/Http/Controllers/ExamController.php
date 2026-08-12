@@ -10,14 +10,10 @@ use Takshak\Exam\Models\PaperSection;
 use Takshak\Exam\Models\Question;
 use Takshak\Exam\Models\UserPaper;
 use Takshak\Exam\Models\UserQuestion;
-use Takshak\Exam\Services\ExamScoringService;
+use Takshak\Exam\Jobs\FinalizeUserPaperJob;
 
 class ExamController extends Controller
 {
-    public function __construct(private ExamScoringService $examScoring)
-    {
-    }
-
     public function papers(Request $request)
     {
         $papers = Paper::query()
@@ -515,10 +511,13 @@ class ExamController extends Controller
         $userPaper   = UserPaper::find($userPaperId);
         $userPaper->update(['submit_at' => now()]);
 
-        // Scoring lives in ExamScoringService so this path and the scheduled finalizer
-        // for expired-but-never-submitted attempts (exam:finalize-expired-user-papers)
-        // share one implementation and cannot drift apart.
-        $this->examScoring->finalizeUserPaper($userPaper->id);
+        // Scoring is a multi-table UPDATE...JOIN — the heaviest write in the exam flow.
+        // Queued rather than run inline so the student's "submitted" response doesn't
+        // wait on it, and so a burst of simultaneous submissions (a class sharing one
+        // end_at) doesn't land on the database as one synchronous spike. Uses the same
+        // ExamScoringService as the scheduled finalizer for expired-but-never-submitted
+        // attempts (exam:finalize-expired-user-papers), so the two can't drift apart.
+        FinalizeUserPaperJob::dispatch($userPaper->id);
 
         $this->invalidateUserQuestionsCache($userPaperId);
 

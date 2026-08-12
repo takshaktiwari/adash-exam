@@ -344,14 +344,32 @@
             });
 
 
+            // Locks every action button, not just the one clicked — otherwise a student
+            // whose "Next" is stuck waiting can tap "Prev" or "Mark for later" while the
+            // first request is still in flight, firing two concurrent requests for the
+            // same attempt. htmx:timeout/sendError/responseError (in the layout) restore
+            // this state if the request fails instead of leaving it stuck permanently.
+            function lockActionButtons() {
+                $(".action_btn").each(function() {
+                    if (!this.hasAttribute('data-original-html')) {
+                        this.setAttribute('data-original-html', this.innerHTML);
+                    }
+                    $(this).addClass('disabled').html('Please wait');
+                });
+            }
+
             $("a.action_btn").click(function() {
-                $(this).addClass('disabled');
-                $(this).html('Please wait');
+                if ($(this).hasClass('disabled')) {
+                    return false; // already submitting a previous action, ignore
+                }
+                lockActionButtons();
             });
             $("button.action_btn").click(function() {
+                if ($(this).hasClass('disabled')) {
+                    return false;
+                }
                 if ($("#question_form")[0].checkValidity()) {
-                    $(this).addClass('disabled');
-                    $(this).html('Please wait');
+                    lockActionButtons();
                 }
             });
 
@@ -395,7 +413,15 @@
                 if (distance < 0) {
                     clearInterval(x);
                     document.getElementById("time_left_timer").innerHTML = "EXPIRED";
-                    window.location.href = "{{ route('exam.submit', [$paper]) }}";
+                    // A batch of students who started together shares the same end_at,
+                    // so every browser's timer hits zero within the same second. A
+                    // random spread here means those submits land across ~10s instead
+                    // of all landing on the database in the same instant — it doesn't
+                    // cost the student any of their allotted time, it just staggers
+                    // when this particular request is sent.
+                    setTimeout(function() {
+                        window.location.href = "{{ route('exam.submit', [$paper]) }}";
+                    }, Math.random() * 10000);
                 }
             }, 1000);
         </script>
