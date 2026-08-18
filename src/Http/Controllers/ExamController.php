@@ -351,7 +351,10 @@ class ExamController extends Controller
 
         $userQuestion = $userQuestions->where('question_id', $question->id)->first();
 
-        return View::first(['exam.paper', 'exam::exam.paper'])->with([
+        // Wrapped in response() (not returned as a bare View) so callers that render
+        // this inline — questionSave/questionMark/questionReset, to collapse their
+        // redirect+re-render into a single request — can attach an HX-Push-Url header.
+        return response(View::first(['exam.paper', 'exam::exam.paper'])->with([
             'paper'        => $paper,
             'question'     => $question,
             'questions'    => $questions,
@@ -359,7 +362,31 @@ class ExamController extends Controller
             'userPaper'    => $userPaper,
             'userQuestion' => $userQuestion,
             'userQuestions' => $userQuestions,
-        ]);
+        ]));
+    }
+
+    /**
+     * Render the next question inline instead of redirecting to exam.paper — halves
+     * the requests per student action (was POST save -> 302 -> GET paper, now just
+     * POST save -> rendered response). HX-Push-Url keeps the address bar and
+     * browser history correct since htmx isn't following a real redirect here.
+     * Setting both attributes and query covers Laravel's Request::get() lookup
+     * regardless of HTTP method (POST reads $request->request first, GET reads
+     * $request->query first, both fall back through attributes then query).
+     * submit_section is stripped so this internal call can never accidentally
+     * re-trigger paper()'s section-submit branch.
+     */
+    private function renderNextQuestion(Request $request, $paper_id, $question_id, $pushUrlPaper)
+    {
+        $request->query->remove('submit_section');
+        $request->request->remove('submit_section');
+        $request->query->set('question_id', $question_id);
+        $request->attributes->set('question_id', $question_id);
+
+        $response = $this->paper($request, $paper_id);
+        $response->header('HX-Push-Url', route('exam.paper', ['paper' => $pushUrlPaper, 'question_id' => $question_id]));
+
+        return $response;
     }
 
     public function questionSave(Request $request, $paper_id, $question_id)
@@ -424,7 +451,7 @@ class ExamController extends Controller
 
         $nextQuestionId = $request->post('next_question_id') ?: $question->id;
 
-        return redirect()->route('exam.paper', [$paper, 'question_id' => $nextQuestionId]);
+        return $this->renderNextQuestion($request, $paper_id, $nextQuestionId, $paper);
     }
 
     public function questionMark(Request $request, $paper_id, $question_id)
@@ -479,10 +506,10 @@ class ExamController extends Controller
 
         $nextQuestionId = $request->input('next_question_id') ?: $question->id;
 
-        return redirect()->route('exam.paper', [$paper, 'question_id' => $nextQuestionId]);
+        return $this->renderNextQuestion($request, $paper_id, $nextQuestionId, $paper);
     }
 
-    public function questionReset($paper_id, $question_id)
+    public function questionReset(Request $request, $paper_id, $question_id)
     {
         UserQuestion::query()
             ->where([
@@ -495,7 +522,7 @@ class ExamController extends Controller
 
         $this->invalidateUserQuestionsCache(session('exam.user_paper.id'));
 
-        return redirect()->route('exam.paper', [$paper_id, 'question_id' => $question_id]);
+        return $this->renderNextQuestion($request, $paper_id, $question_id, $paper_id);
     }
 
     public function submit(Paper $paper)
