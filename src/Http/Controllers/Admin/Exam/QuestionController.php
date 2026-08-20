@@ -247,6 +247,8 @@ class QuestionController extends Controller
 
     public function uploadDo(Request $request)
     {
+        $originalName = $request->file('upload_file')->getClientOriginalName();
+
         $imported_file = $request->file('upload_file')
             ->storeAs(
                 'imports',
@@ -255,8 +257,13 @@ class QuestionController extends Controller
 
 
         try {
-            Excel::import(new QuestionsImport(), Storage::path($imported_file));
-            return redirect()->route('admin.exam.questions.index')->withErrors('SUCCESS !! Question List is successfully updated');
+            Excel::import(
+                new QuestionsImport($request->user()?->id, $originalName),
+                Storage::path($imported_file)
+            );
+
+            return redirect()->route('admin.exam.questions.index')
+                ->withErrors('QUEUED !! Your file is being processed, you will be notified once the import finishes.');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());
         }
