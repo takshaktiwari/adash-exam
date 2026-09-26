@@ -39,6 +39,26 @@
                 <div class="card-body">
                     <table class="table table-sm mb-0">
                         <tr>
+                            <th>Started At</th>
+                            <td>{{ $userPaper->start_at?->format('d-M-Y h:i:s A') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Submitted At</th>
+                            <td>
+                                @if ($userPaper->submit_at)
+                                    {{ $userPaper->submit_at->format('d-M-Y h:i:s A') }}
+                                @else
+                                    <span class="text-muted">In progress</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @if ($userPaper->start_at && $userPaper->submit_at)
+                            <tr>
+                                <th>Time Taken</th>
+                                <td>{{ $userPaper->start_at->diffForHumans($userPaper->submit_at, ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE, 'parts' => 3]) }}</td>
+                            </tr>
+                        @endif
+                        <tr>
                             <th>Answered</th>
                             <td>{{ $userPaper->questions->where('status', 'answered')->count() }} Questions</td>
                         </tr>

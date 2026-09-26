@@ -4,7 +4,8 @@
             <th>#</th>
             <th>Paper</th>
             <th>Questions</th>
-            <th>Stared At</th>
+            <th>Started At</th>
+            <th>Submitted At</th>
             <th>Marks</th>
             <th>Action</th>
         </thead>
@@ -21,6 +22,7 @@
                         Marked: {{ $userPaper->questions->where('status', 'marked')->count() }}
                     </td>
                     <td>{{ $userPaper->start_at?->format('d-M-Y h:i A') }}</td>
+                    <td>{!! $userPaper->submit_at?->format('d-M-Y h:i A') ?? '<span class="text-muted">In progress</span>' !!}</td>
                     <td>{{ $userPaper->questions->where('status', 'answered')->sum('marks') }}</td>
                     <td>
                         <a href="{{ route('exam.user-papers.show', [$paper, $userPaper]) }}" class="btn btn-sm btn-info">

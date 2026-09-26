@@ -25,6 +25,7 @@ class UserPapersDataTable extends DataTable
             ->addIndexColumn()
             ->editColumn('created_at', fn($item) => $item->created_at->format('Y-m-d h:i A'))
             ->editColumn('start_at', fn($item) => $item->start_at->format('Y-m-d h:i A'))
+            ->editColumn('submit_at', fn($item) => $item->submit_at?->format('Y-m-d h:i A') ?? 'In progress')
             ->editColumn('answered_questions_count', function ($item) {
                 return $item->questions->where('status', 'answered')->count();
             })
@@ -168,9 +169,9 @@ class UserPapersDataTable extends DataTable
                 ->orderable(false)->sortable(false)->searchable(false),
             Column::make('answered_questions_count')->title('Ans. Ques.')
                 ->orderable(false)->sortable(false)->searchable(false),
-            Column::make('start_at'),
+            Column::make('start_at')->title('Started At'),
+            Column::make('submit_at')->title('Submitted At'),
             Column::make('marks')->orderable(false)->sortable(false)->searchable(false),
-            Column::make('created_at'),
         ];
     }
 
